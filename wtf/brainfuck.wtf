@@ -1,0 +1,19 @@
+;START
+_0 ^ & > & > & > & > & > & > & > & _0 #input a byte, and copy it 8 times
+  #these 8 lines translate a BF instruction to WTFZOMFG
+  @+ | { .+ }
+> @- | { .- }
+> @< | { .< }
+> @> | { .> }
+> @, | { .^ }
+> @. | { .v }
+> @[ | { .( }
+> @] | { .) }
+
+> + | { 
+    :END
+}
+
+:START
+
+;END
