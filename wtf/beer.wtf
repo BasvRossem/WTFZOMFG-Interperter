@@ -1,0 +1,18 @@
+++[in line 
+comment]++
+~80+>><<+
+#comment
+;BOTTLES
+( 
+    v 
+    ' bottles of beer on the wall " 
+    v 
+    ' bottles of beer\nTake one down, pass it around, " 
+    - v 
+    ' bottles of beer on the wall!\n" 
+)
+'No more bottles of beer on the wall, No more bottles of beer, go to the store, buy some more, 99 bottles of beer on the wall!"
+
+|{
+    :BOTTLES
+}
