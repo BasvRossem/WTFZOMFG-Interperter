@@ -1,11 +1,11 @@
 '========================"
 '= Start Program Part 1 ="
-'========================"
+'========================\n"
 # Dit is een comment
-+++++v
+=10v
 (
-    -
-)
+    -v
+)w
 v
 
 '========================"
@@ -25,11 +25,11 @@ v
 
 'Loop starts"
 (
-    'Loops Left:"
+    '\nLoops Left: "
     v-
     >
     +++
-    'Small countdown"
+    ' Small countdown "
     (
         v-
     )

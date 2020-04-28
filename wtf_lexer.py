@@ -81,19 +81,22 @@ def find_token(lexer_state, element):
     A function which turns a character into a token
     Returns a list of tokens
     """
+    if element == '\\':
+        print("======================================================================================")
+        #TODO: If a single backslah is found in the file without any character after it, it is skipped in the lexer  
     state = copy(lexer_state)
     if state == LexerStates.DEFAULT and element in TOKENS:
         if TOKENS[element] == 'PRINT_CHARACTER':
             state = LexerStates.PRINT
         if TOKENS[element] == 'PRINT_UNTIL':
             state = LexerStates.PRINT_UNTIL
-        if TOKENS[element] == 'COMMENT':
+        if TOKENS[element] == 'COMMENT' or TOKENS[element] == 'LABEL_DECLARE' or TOKENS[element] == 'LABEL_GOTO':
             state = LexerStates.COMMENT
         if TOKENS[element] == 'COMMENT_START':
             state = LexerStates.COMMENT_UNTIL
         if TOKENS[element] == 'CELL_SUBTRACT_ASCII':
             state = LexerStates.CELL_SUBTRACT_ASCII
-        if TOKENS[element] == 'POINTER_MOVE_RELATIVE':
+        if TOKENS[element] == 'POINTER_MOVE_RELATIVE' or TOKENS[element] == 'SCAN_DECIMAL':
             state = LexerStates.POINTER_MOVE_RELATIVE
         return state, Token(TOKENS[element], None)
     if state == LexerStates.PRINT:
@@ -129,9 +132,7 @@ def cleanup_tokens(token_list):
             while i < len(token_list) and token_list[i].value:
                 stiched += token_list[i].value
                 i += 1
-            # Check if not empty
-            if stiched.replace(" ", "").replace("\n", "") != "":
-                previous.value = stiched.replace("\n", "")
+            previous.value = stiched.replace("\n", "")
 
     # Remove comments
     new_clean_tokens = []
@@ -158,4 +159,8 @@ def make_tokens(source):
         lxr_state, returned_token = find_token(lxr_state, element)
         token_list.append(returned_token)
     clean_tokens = cleanup_tokens(token_list)
+    print("========================")
+    for tok in clean_tokens:
+        print(tok)
+    print("========================")
     return clean_tokens
