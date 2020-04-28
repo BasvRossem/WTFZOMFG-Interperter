@@ -49,6 +49,9 @@ TOKENS = {
     '#' : 'COMMENT',
     '[' : 'COMMENT_START',
     ']' : 'COMMENT_END',
+
+    # Debug
+    'w' : "PRINT_PROGRAM_STATE"
 }
 
 class Token():
@@ -58,10 +61,10 @@ class Token():
         self.value = value
 
     def __str__(self):
-        return str(self.command) + ", " + str(self.value)
+        return "(" + str(self.command) + ", " + str(self.value) + ")"
 
     def __repr__(self):
-        return (self.command, self.value)
+        return self.__str__()
 
 class LexerStates(Enum):
     """A class which represents all the possible states the lexer can be in"""

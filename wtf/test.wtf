@@ -1,0 +1,21 @@
+'================================\n"
+'TEST: PRINT_UNTIL\n"
+'Hello\nHello\n"
+
+'================================\n"
+'TEST: CELL_INCREASE\n"
++++++
+w
+'================================\n"
+'TEST: CELL_DECREASE\n"
+-----
+w
+'================================\n"
+'TEST: IF\n"
++{
+    'This sould be printed"
+}
+-{
+    'This sould never be printed"
+}
+'================================\n"
