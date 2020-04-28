@@ -28,7 +28,7 @@ class Function():
     def __repr__(self):
         return self.__str__()
 
-def function_template(program_state):
+def function_template(program_state, args):
     ps = copy(program_state)
 
     return ps
@@ -63,6 +63,86 @@ def cell_decrease(program_state, args):
     ps.memory[ps.pointer] -= 1
     return ps
 
+def cell_flip(program_state, args):
+    ps = copy(program_state)
+    if ps.memory[ps.pointer]:
+        ps.memory[ps.pointer] = 0
+    else:
+        ps.memory[ps.pointer] = 1
+    return ps
+
+def cell_set(program_state, args):
+    ps = copy(program_state)
+    ps.memory[ps.pointer] = int(args)
+    return ps
+
+def cell_increase_with(program_state, args):
+    ps = copy(program_state)
+    ps.memory[ps.pointer] += int(args)
+    return ps
+
+def copy_value_right(program_state, args):
+    ps = copy(program_state)
+    ps.memory[ps.pointer + 1] = ps.memory[ps.pointer]
+    return ps
+
+def copy_value_to(program_state, args):
+    ps = copy(program_state)
+    ps.memory[int(args)] = ps.memory[ps.pointer]
+    return ps
+
+def pointer_move_left(program_state, args):
+    ps = copy(program_state)
+    ps.pointer -= 1
+    return ps
+
+def pointer_move_right(program_state, args):
+    ps = copy(program_state)
+    ps.pointer += 1
+    if ps.pointer < 0:
+        ps.error = "Memory pointer cannot be a negative number"
+    return ps
+
+def pointer_move_to(program_state, args):
+    ps = copy(program_state)
+    ps.pointer = int(args)
+    if ps.pointer < 0:
+        ps.error = "Memory pointer cannot be a negative number"
+    return ps
+
+def pointer_move_relative(program_state, args):
+    ps = copy(program_state)
+    ps.pointer += int(args)
+    if ps.pointer < 0:
+        ps.error = "Memory pointer cannot be a negative number"
+    return ps
+
+def cell_subtract_ascii(program_state, args):
+    ps = copy(program_state)
+    ps.memory[ps.pointer] -= ord(args)
+    return ps
+
+# Arithmetic
+def cell_add_right(program_state, args):
+    ps = copy(program_state)
+    ps.memory[ps.pointer] = int(ps.memory[ps.pointer] + ps.memory[ps.pointer + 1])
+    return ps
+
+def cell_subtract_right(program_state, args):
+    ps = copy(program_state)
+    ps.memory[ps.pointer] = int(ps.memory[ps.pointer] - ps.memory[ps.pointer + 1])
+    return ps
+
+def cell_multiply_right(program_state, args):
+    ps = copy(program_state)
+    ps.memory[ps.pointer] = int(ps.memory[ps.pointer] * ps.memory[ps.pointer + 1])
+    return ps
+
+def cell_devide_right(program_state, args):
+    ps = copy(program_state)
+    ps.memory[ps.pointer] = int(ps.memory[ps.pointer] / ps.memory[ps.pointer + 1])
+    return ps
+
 # Input/Output
 def print_until(program_state, args):
     ps = copy(program_state)
@@ -84,21 +164,54 @@ def parse(tokens, token_index = 0):
         if tokens[i].command == 'IF_START':
             args, i = parse(tokens, i + 1)
             functions.append(Function(if_start, args))
-        if tokens[i].command == 'IF_END':
+        elif tokens[i].command == 'IF_END':
             break
 
         # Cell/Pointer manipulation
-        if tokens[i].command == 'CELL_INCREASE':
+        elif tokens[i].command == 'CELL_INCREASE':
             functions.append(Function(cell_increase, None))
-        if tokens[i].command == 'CELL_DECREASE':
+        elif tokens[i].command == 'CELL_DECREASE':
             functions.append(Function(cell_decrease, None))
+        elif tokens[i].command == 'CELL_FLIP':
+            functions.append(Function(cell_flip, None))
+        elif tokens[i].command == 'CELL_SET':
+            functions.append(Function(cell_set, tokens[i].value))
+        elif tokens[i].command == 'CELL_INCREASE_WITH':
+            functions.append(Function(cell_increase_with, tokens[i].value))
+
+        elif tokens[i].command == 'COPY_VALUE_RIGHT':
+            functions.append(Function(copy_value_right, None))
+        elif tokens[i].command == 'COPY_VALUE_TO':
+            functions.append(Function(copy_value_to, tokens[i].value))
+
+        elif tokens[i].command == 'POINTER_MOVE_LEFT':
+            functions.append(Function(pointer_move_left, None))
+        elif tokens[i].command == 'POINTER_MOVE_RIGHT':
+            functions.append(Function(pointer_move_right, None))
+        elif tokens[i].command == 'POINTER_MOVE_TO':
+            functions.append(Function(pointer_move_to, tokens[i].value))
+        elif tokens[i].command == 'POINTER_MOVE_RELATIVE':
+            functions.append(Function(pointer_move_relative, tokens[i].value))
+        
+        elif tokens[i].command == 'CELL_SUBTRACT_ASCII':
+            functions.append(Function(cell_subtract_ascii, tokens[i].value))
+
+        # Arithmetic
+        elif tokens[i].command == 'CELL_ADD_RIGHT':
+            functions.append(Function(cell_add_right, None))
+        elif tokens[i].command == 'CELL_SUBTRACT_RIGHT':
+            functions.append(Function(cell_subtract_right, None))
+        elif tokens[i].command == 'CELL_MULTIPLY_RIGHT':
+            functions.append(Function(cell_multiply_right, None))
+        elif tokens[i].command == 'CELL_DEVIDE_RIGHT':
+            functions.append(Function(cell_devide_right, None))
 
         # Input/Output
-        if tokens[i].command == 'PRINT_UNTIL':
+        elif tokens[i].command == 'PRINT_UNTIL':
             functions.append(Function(print_until, tokens[i].value))
         
         # Debug
-        if tokens[i].command == 'PRINT_PROGRAM_STATE':
+        elif tokens[i].command == 'PRINT_PROGRAM_STATE':
             functions.append(Function(print_program_state, None))
         i += 1
     return functions, i

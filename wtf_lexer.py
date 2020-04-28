@@ -73,6 +73,8 @@ class LexerStates(Enum):
     PRINT_UNTIL = 2
     COMMENT = 3
     COMMENT_UNTIL = 4
+    CELL_SUBTRACT_ASCII = 5
+    POINTER_MOVE_RELATIVE = 6
 
 def find_token(lexer_state, element):
     """
@@ -89,8 +91,16 @@ def find_token(lexer_state, element):
             state = LexerStates.COMMENT
         if TOKENS[element] == 'COMMENT_START':
             state = LexerStates.COMMENT_UNTIL
+        if TOKENS[element] == 'CELL_SUBTRACT_ASCII':
+            state = LexerStates.CELL_SUBTRACT_ASCII
+        if TOKENS[element] == 'POINTER_MOVE_RELATIVE':
+            state = LexerStates.POINTER_MOVE_RELATIVE
         return state, Token(TOKENS[element], None)
     if state == LexerStates.PRINT:
+        state = LexerStates.DEFAULT
+    if state == LexerStates.CELL_SUBTRACT_ASCII:
+        state = LexerStates.DEFAULT
+    if state == LexerStates.POINTER_MOVE_RELATIVE:
         state = LexerStates.DEFAULT
     if state == LexerStates.COMMENT:
         if element == '\n':

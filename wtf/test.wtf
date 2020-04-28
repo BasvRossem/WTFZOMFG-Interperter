@@ -13,9 +13,21 @@ w
 '================================\n"
 'TEST: IF\n"
 +{
-    'This sould be printed"
+    'This should be printed\n"
 }
 -{
-    'This sould never be printed"
+    'This should never be printed\n"
 }
 '================================\n"
+'TEST: ARITHMETIC\n"
++++++>++++++++<aw   # 5 + 8 = 13
+>----<sw            # 13 - 4 = 9
+mw                  # 9 * 4 = 36
+>--< dw             # 36 / 2 = 18
+'================================\n"
+&w                  # Copy 18 from cell 0 to cell 1
+%5w                 # Copy 18 from cell 0 to cell 5
+_0 |                # Flip cell 0 from 18 to 0
+_5 =46 @-w          # Go to cell 5, set the value to 46 and subtract the ASCII value of '-' (45)
+*-4w                # Move pointer 4 to the left
+*6 |w               # Move pointer 6 to the right and flip cell
