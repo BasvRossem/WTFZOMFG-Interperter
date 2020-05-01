@@ -14,12 +14,12 @@ TOKENS_COMMAND = {
     '+' : 'CELL_INCREASE',
     '-' : 'CELL_DECREASE',
     '|' : 'CELL_FLIP',
-    
+
     '&' : 'COPY_VALUE_RIGHT',
-    
+
     '<' : 'POINTER_MOVE_LEFT',
     '>' : 'POINTER_MOVE_RIGHT',
-    
+
     # Arithmetic
     'a' : 'CELL_ADD_RIGHT',
     's' : 'CELL_SUBTRACT_RIGHT',
@@ -46,9 +46,9 @@ TOKENS_COMMAND_VALUE = {
     # Cell/Pointer Manipulation
     '=' : 'CELL_SET',
     '~' : 'CELL_INCREASE_WITH',
-    
+
     '%' : 'COPY_VALUE_TO',
-    
+
     '_' : 'POINTER_MOVE_TO',
     '*' : 'POINTER_MOVE_RELATIVE',
 
@@ -100,37 +100,46 @@ def switch_lexer_state(lexer_state, command):
     return state
 
 def find_token(lexer_state, element):
+    """
+    A fucntion that creates a token using an element
+    """
     state = copy(lexer_state)
     token = Token(None, None)
-    
-    if state == LexerStates.DEFAULT:    # Lexer will try to make a new token
-        if element in TOKENS_COMMAND and len(element) == 1:   # The character is a single character command
+
+    # The lexer will try to make a new token
+    if state == LexerStates.DEFAULT:
+        # The element is a valid single character command
+        if element in TOKENS_COMMAND and len(element) == 1:
             token.command = TOKENS_COMMAND[element]
-        elif element[0] in TOKENS_COMMAND_VALUE:  # The character is a command and a value 
+        # The element is a valid single character command that reqiures a value
+        elif element[0] in TOKENS_COMMAND_VALUE:
             token.command = TOKENS_COMMAND_VALUE[element[0]]
             token.value = element[1:]
             state = switch_lexer_state(state, token.command)
+            # If the command is a multi character print
             if token.command == 'PRINT_UNTIL' and element[-1] == '"':
                 token.value = element[1:-1]
                 state = LexerStates.DEFAULT
+            # If the command is a multi character comment
             if token.command == 'COMMENT_START' and element[-1] == ']':
                 token.value = element[1:-1]
                 state = LexerStates.DEFAULT
+    # The lexer will need to add these tokens to the last, so mark them if needed
     elif state != LexerStates.DEFAULT:
         token.command = 'ADD_TO_PREVIOUS'
-        if state == LexerStates.GO_UNTIL_NEWLINE and element[-1] == '\n':
+        combinations = [
+            state == LexerStates.GO_UNTIL_NEWLINE and element[-1] == '\n',
+            state == LexerStates.GO_UNTIL_END_PRINT and element[-1] == '\"',
+            state == LexerStates.GO_UNTIL_END_COMMENT and element[-1] == ']'
+        ]
+        if any(combinations):
             token.value = element[:-1]
             state = LexerStates.DEFAULT
-        elif state == LexerStates.GO_UNTIL_END_PRINT and element[-1] == '\"':
-            token.value = element[:-1]
-            state = LexerStates.DEFAULT 
-        elif state == LexerStates.GO_UNTIL_END_COMMENT and element[-1] == ']':
-            token.value = element[:-1]
-            state = LexerStates.DEFAULT 
         else:
             token.value = element
 
-    if token.value == "\n": #Remove empty add to previous that have nothing to do with the string 
+    # Remove empty add to previous that have nothing to do with the string
+    if token.value == "\n":
         token.command = None
         token.value = None
     return state, token
@@ -143,7 +152,7 @@ def combine_tokens(token_list, i):
     if not i < len(tokens):
         tokens.reverse()
         return tokens
-    
+
     if tokens[i].command == 'ADD_TO_PREVIOUS':
         tokens[i + 1].value += " " + tokens[i].value
         tokens[i].command = None
