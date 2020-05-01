@@ -116,27 +116,20 @@ def find_token(lexer_state, element):
             if token.command == 'COMMENT_START' and element[-1] == ']':
                 token.value = element[1:-1]
                 state = LexerStates.DEFAULT
-    elif state == LexerStates.GO_UNTIL_NEWLINE:
+    elif state != LexerStates.DEFAULT:
         token.command = 'ADD_TO_PREVIOUS'
-        if element[-1] == '\n':
+        if state == LexerStates.GO_UNTIL_NEWLINE and element[-1] == '\n':
             token.value = element[:-1]
-            state = LexerStates.DEFAULT    
+            state = LexerStates.DEFAULT
+        elif state == LexerStates.GO_UNTIL_END_PRINT and element[-1] == '\"':
+            token.value = element[:-1]
+            state = LexerStates.DEFAULT 
+        elif state == LexerStates.GO_UNTIL_END_COMMENT and element[-1] == ']':
+            token.value = element[:-1]
+            state = LexerStates.DEFAULT 
         else:
             token.value = element
-    elif state == LexerStates.GO_UNTIL_END_PRINT:
-        token.command = 'ADD_TO_PREVIOUS'
-        if element[-1] == '\"':
-            token.value = element[:-1]
-            state = LexerStates.DEFAULT    
-        else:
-            token.value = element
-    elif state == LexerStates.GO_UNTIL_END_COMMENT:
-        token.command = 'ADD_TO_PREVIOUS'
-        if element[-1] == ']':
-            token.value = element[:-1]
-            state = LexerStates.DEFAULT    
-        else:
-            token.value = element   
+
     if token.value == "\n": #Remove empty add to previous that have nothing to do with the string 
         token.command = None
         token.value = None
@@ -167,21 +160,23 @@ def cleanup_tokens(token_list):
 
     return tokens
 
-def make_tokens(source):
+def make_tokens(token_list, lexer_state, source_list, i):
+    tokens = copy(token_list)
+    state = copy(lexer_state)
+
+    if not i < len(source_list):
+        return tokens
+
+    state, token = find_token(state, source_list[i])
+    tokens.append(token)
+    i += 1
+    return make_tokens(tokens, state, source_list, i)
+
+def lexer(source):
     """
     A function that converts a string of characters into tokens
     Returns a list of tokens
     """
     source_list = re.findall(r'\S+|\n', source)
-    
-    token_list = []
-    lxr_state = LexerStates.DEFAULT
-    for element in source_list:
-        lxr_state, returned_token = find_token(lxr_state, element)
-        token_list.append(returned_token)
-    
-    token_list = cleanup_tokens(token_list)
-
-
-    print(token_list)
-    return token_list
+    tokens = make_tokens([], LexerStates.DEFAULT, source_list, 0)
+    return cleanup_tokens(tokens)
