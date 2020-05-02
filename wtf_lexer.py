@@ -1,7 +1,9 @@
 """A WTFZOMFG Lexer"""
 from copy import copy
-from enum import Enum
-import re
+from re import findall
+from typing import List, Tuple
+
+from wtf_objects import LexerStates, LexerVars, Token
 
 TOKENS_COMMAND = {
     # Control
@@ -33,8 +35,7 @@ TOKENS_COMMAND = {
     '\\' : 'PRINT_CELL_DECIMAL',
 
     # Debug
-    'w' : "PRINT_PROGRAM_STATE"
-}
+    'w' : "PRINT_PROGRAM_STATE"}
 
 TOKENS_COMMAND_VALUE = {
     # Control
@@ -63,33 +64,15 @@ TOKENS_COMMAND_VALUE = {
     # Commenting
     '#' : 'COMMENT',
     '[' : 'COMMENT_START',
-    ']' : 'COMMENT_END',
-}
+    ']' : 'COMMENT_END'}
 
 LEXER_COMMANDS = [
-    'ADD_TO_PREVIOUS'
-]
+    'ADD_TO_PREVIOUS']
 
-class Token():
-    """A token class which consists of a command and a value if needed"""
-    def __init__(self, command, value):
-        self.command = command
-        self.value = value
-
-    def __str__(self):
-        return "(" + str(self.command) + ", " + str(self.value) + ")"
-
-    def __repr__(self):
-        return self.__str__()
-
-class LexerStates(Enum):
-    """A class which represents all the possible states the lexer can be in"""
-    DEFAULT = 0
-    GO_UNTIL_NEWLINE = 1
-    GO_UNTIL_END_COMMENT = 2
-    GO_UNTIL_END_PRINT = 3
-
-def switch_lexer_state(lexer_state, command):
+def switch_lexer_state(lexer_state: LexerStates, command: str) -> LexerStates:
+    """
+    This function returns a state depending on the command
+    """
     state = copy(lexer_state)
     if command == 'COMMENT':
         state = LexerStates.GO_UNTIL_NEWLINE
@@ -99,7 +82,7 @@ def switch_lexer_state(lexer_state, command):
         state = LexerStates.GO_UNTIL_END_COMMENT
     return state
 
-def find_token(lexer_state, element):
+def find_token(lexer_state: LexerStates, element: str) -> Tuple[LexerStates, Token]:
     """
     A fucntion that creates a token using an element
     """
@@ -144,7 +127,10 @@ def find_token(lexer_state, element):
         token.value = None
     return state, token
 
-def combine_tokens(token_list, i):
+def combine_tokens(token_list: List[Token], i: int) -> List[Token]:
+    """
+    Combines tokens with the next token in the sequence if needed
+    """
     tokens = copy(token_list)
     if i == 0:
         tokens.reverse()
@@ -160,32 +146,70 @@ def combine_tokens(token_list, i):
 
     return combine_tokens(tokens, i)
 
-def cleanup_tokens(token_list):
+def remove_comments(token_list: List[Token], i: int) -> List[Token]:
+    """
+    Removes comment tokens
+    """
+    tokens = copy(token_list)
+    if not i < len(tokens):
+        return tokens
+
+    if tokens[i].command == 'COMMENT' or tokens[i].command == 'COMMENT_START':
+        tokens[i].command = None
+        tokens[i].value = None
+    i += 1
+
+    return remove_comments(tokens, i)
+
+def cleanup_tokens(token_list: List[Token]) -> List[Token]:
+    """
+    A function that cleans up the given tokens.
+
+    This is done in three steps:
+    1. Filtering out all None tokens
+    2. Combining tokens when necessary
+    3. Filtering out all None tokens once more
+
+    Returns a list of tokens
+    """
     tokens = copy(token_list)
 
-    tokens = list(filter(lambda x: x.command, tokens))
+    tokens = list(filter(lambda token: token.command, tokens))
     tokens = combine_tokens(tokens, 0)
-    tokens = list(filter(lambda x: x.command, tokens))
+    tokens = remove_comments(tokens, 0)
+    tokens = list(filter(lambda token: token.command, tokens))
 
     return tokens
 
-def make_tokens(token_list, lexer_state, source_list, i):
-    tokens = copy(token_list)
-    state = copy(lexer_state)
+def make_tokens(lexer_vars: LexerVars) -> List[Token]:
+    """
+    Returns a list of tokens which depend on the previously generated tokens
+    """
+    tokens = copy(lexer_vars.token_list)
+    state = copy(lexer_vars.lexer_state)
+    source = copy(lexer_vars.source_list)
+    i = copy(lexer_vars.i)
 
-    if not i < len(source_list):
+    if not i < len(source):
         return tokens
 
-    state, token = find_token(state, source_list[i])
+    state, token = find_token(state, source[i])
     tokens.append(token)
-    i += 1
-    return make_tokens(tokens, state, source_list, i)
 
-def lexer(source):
+    lexer_variables = LexerVars(
+        tokens,
+        state,
+        source,
+        i + 1)
+
+    return make_tokens(lexer_variables)
+
+def lexer(source: str) -> List[Token]:
     """
     A function that converts a string of characters into tokens
     Returns a list of tokens
     """
-    source_list = re.findall(r'\S+|\n', source)
-    tokens = make_tokens([], LexerStates.DEFAULT, source_list, 0)
+    source_list = findall(r'\S+|\n', source)
+    lexer_vars = LexerVars([], LexerStates.DEFAULT, source_list, 0)
+    tokens = make_tokens(lexer_vars)
     return cleanup_tokens(tokens)
