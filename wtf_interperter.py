@@ -1,4 +1,3 @@
-import parser
 from copy import copy
 
 def run(parsed, program_state, index = 0):

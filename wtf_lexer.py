@@ -1,9 +1,9 @@
 """A WTFZOMFG Lexer"""
-from copy import copy
-from re import findall
+from copy import copy, deepcopy
 from typing import List, Tuple
 
 from wtf_objects import LexerStates, LexerVars, Token
+from wtf_errors import UnknownCharacterError
 
 TOKENS_COMMAND = {
     # Control
@@ -82,50 +82,58 @@ def switch_lexer_state(lexer_state: LexerStates, command: str) -> LexerStates:
         state = LexerStates.GO_UNTIL_END_COMMENT
     return state
 
-def find_token(lexer_state: LexerStates, element: str) -> Tuple[LexerStates, Token]:
+def find_token(lexer_vars: LexerVars, word: str) -> Tuple[LexerVars, Token]:
     """
-    A fucntion that creates a token using an element
+    A function that creates a token using an word
     """
-    state = copy(lexer_state)
+    lxr_vrs = deepcopy(lexer_vars)
     token = Token(None, None)
 
     # The lexer will try to make a new token
-    if state == LexerStates.DEFAULT:
-        # The element is a valid single character command
-        if element in TOKENS_COMMAND and len(element) == 1:
-            token.command = TOKENS_COMMAND[element]
-        # The element is a valid single character command that reqiures a value
-        elif element[0] in TOKENS_COMMAND_VALUE:
-            token.command = TOKENS_COMMAND_VALUE[element[0]]
-            token.value = element[1:]
-            state = switch_lexer_state(state, token.command)
+    if lxr_vrs.state == LexerStates.DEFAULT:
+        # The word is a valid single character command
+        # print(word)
+        if word in TOKENS_COMMAND and len(word) == 1:
+            token.command = TOKENS_COMMAND[word]
+        # The word is a valid single character command that reqiures a value
+        elif word[0] in TOKENS_COMMAND_VALUE:
+            token.command = TOKENS_COMMAND_VALUE[word[0]]
+            token.value = word[1:]
+            lxr_vrs.state = switch_lexer_state(lxr_vrs.state, token.command)
             # If the command is a multi character print
-            if token.command == 'PRINT_UNTIL' and element[-1] == '"':
-                token.value = element[1:-1]
-                state = LexerStates.DEFAULT
+            if token.command == 'PRINT_UNTIL' and word[-1] == '"':
+                token.value = word[1:-1]
+                lxr_vrs.state = LexerStates.DEFAULT
             # If the command is a multi character comment
-            if token.command == 'COMMENT_START' and element[-1] == ']':
-                token.value = element[1:-1]
-                state = LexerStates.DEFAULT
+            if token.command == 'COMMENT_START' and word[-1] == ']':
+                token.value = word[1:-1]
+                lxr_vrs.state = LexerStates.DEFAULT
+        # The Token is unknown in the list
+        elif word is not "\n":
+            line_nr = lxr_vrs.line_nr + 1
+            word_nr = lxr_vrs.word_nr + 1
+            error = UnknownCharacterError(word[0], word, line_nr, word_nr)
+            lxr_vrs.errors.append(error)
     # The lexer will need to add these tokens to the last, so mark them if needed
-    elif state != LexerStates.DEFAULT:
+    elif lxr_vrs.state != LexerStates.DEFAULT:
         token.command = 'ADD_TO_PREVIOUS'
         combinations = [
-            state == LexerStates.GO_UNTIL_NEWLINE and element[-1] == '\n',
-            state == LexerStates.GO_UNTIL_END_PRINT and element[-1] == '\"',
-            state == LexerStates.GO_UNTIL_END_COMMENT and element[-1] == ']'
+            lxr_vrs.state == LexerStates.GO_UNTIL_NEWLINE and word[-1] == '\n',
+            lxr_vrs.state == LexerStates.GO_UNTIL_END_PRINT and word[-1] == '\"',
+            lxr_vrs.state == LexerStates.GO_UNTIL_END_COMMENT and word[-1] == ']'
         ]
         if any(combinations):
-            token.value = element[:-1]
-            state = LexerStates.DEFAULT
+            token.value = word[:-1]
+            lxr_vrs.state = LexerStates.DEFAULT
         else:
-            token.value = element
+            token.value = word
 
     # Remove empty add to previous that have nothing to do with the string
     if token.value == "\n":
         token.command = None
         token.value = None
-    return state, token
+    # print(token)
+    return lxr_vrs, token
 
 def combine_tokens(token_list: List[Token], i: int) -> List[Token]:
     """
@@ -181,35 +189,45 @@ def cleanup_tokens(token_list: List[Token]) -> List[Token]:
 
     return tokens
 
-def make_tokens(lexer_vars: LexerVars) -> List[Token]:
+def process_line(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
     """
     Returns a list of tokens which depend on the previously generated tokens
     """
-    tokens = copy(lexer_vars.token_list)
-    state = copy(lexer_vars.lexer_state)
-    source = copy(lexer_vars.source_list)
-    i = copy(lexer_vars.i)
+    lxr_vrs = deepcopy(lexer_vars)
 
-    if not i < len(source):
-        return tokens
+    if not lxr_vrs.word_nr < len(lxr_vrs.source[lxr_vrs.line_nr]):
+        return lxr_vrs, lxr_vrs.tokens
 
-    state, token = find_token(state, source[i])
-    tokens.append(token)
+    current_word = lxr_vrs.source[lxr_vrs.line_nr][lxr_vrs.word_nr]
 
-    lexer_variables = LexerVars(
-        tokens,
-        state,
-        source,
-        i + 1)
+    lxr_vrs, token = find_token(lxr_vrs, current_word)
+    lxr_vrs.tokens.append(token)
+    lxr_vrs.word_nr += 1
 
-    return make_tokens(lexer_variables)
+    return process_line(lxr_vrs)
+
+def process_lines(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
+    """
+    A function that recursively goes through every list in the source_list of a LexerVars
+    object and generates tokens for that list using the process_line function
+    """
+    lexer_variables = deepcopy(lexer_vars)
+    tokens = []
+    while lexer_variables.line_nr < len(lexer_variables.source):
+        line_tokens = []
+        lexer_variables, line_tokens = process_line(lexer_variables)
+        tokens.extend(line_tokens)
+        lexer_variables.word_nr = 0
+        lexer_variables.line_nr += 1
+        lexer_variables.token_list = []
+    return lexer_variables, tokens
 
 def lexer(source: str) -> List[Token]:
     """
     A function that converts a string of characters into tokens
     Returns a list of tokens
     """
-    source_list = findall(r'\S+|\n', source)
-    lexer_vars = LexerVars([], LexerStates.DEFAULT, source_list, 0)
-    tokens = make_tokens(lexer_vars)
+    source_list = [(line.strip("\n")).split() + ['\n'] for line in source]
+    lexer_vars = LexerVars([], LexerStates.DEFAULT, source_list, 0, 0, [])
+    lexer_vars, tokens = process_lines(lexer_vars)
     return cleanup_tokens(tokens)
