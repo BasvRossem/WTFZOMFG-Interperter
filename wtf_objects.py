@@ -12,7 +12,7 @@ class LexerStates(Enum):
 
 class Token:
     """A token class which consists of a command and a value if needed"""
-    def __init__(self, command: str, value: str):
+    def __init__(self, command: str = None, value: str = None):
         self.command = command
         self.value = value
 
@@ -67,7 +67,7 @@ class ProgramState:
 
 class Function:
     """A data object that holds a function and its arguments"""
-    def __init__(self, function, args):
+    def __init__(self, function=None, args=None):
         self.func = function
         self.args = args
 

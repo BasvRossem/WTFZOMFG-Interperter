@@ -1,73 +1,74 @@
 """A WTFZOMFG Lexer"""
 from copy import copy, deepcopy
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
+from wtf_errors import UnknownCharacterError, WtfError
 from wtf_objects import LexerStates, LexerVars, Token
-from wtf_errors import UnknownCharacterError
 
 TOKENS_COMMAND = {
     # Control
-    '(' : 'LOOP_START',
-    ')' : 'LOOP_END',
-    '{' : 'IF_START',
-    '}' : 'IF_END',
+    '(': 'LOOP_START',
+    ')': 'LOOP_END',
+    '{': 'IF_START',
+    '}': 'IF_END',
 
     # Cell/Pointer Manipulation
-    '+' : 'CELL_INCREASE',
-    '-' : 'CELL_DECREASE',
-    '|' : 'CELL_FLIP',
+    '+': 'CELL_INCREASE',
+    '-': 'CELL_DECREASE',
+    '|': 'CELL_FLIP',
 
-    '&' : 'COPY_VALUE_RIGHT',
+    '&': 'COPY_VALUE_RIGHT',
 
-    '<' : 'POINTER_MOVE_LEFT',
-    '>' : 'POINTER_MOVE_RIGHT',
+    '<': 'POINTER_MOVE_LEFT',
+    '>': 'POINTER_MOVE_RIGHT',
 
     # Arithmetic
-    'a' : 'CELL_ADD_RIGHT',
-    's' : 'CELL_SUBTRACT_RIGHT',
-    'm' : 'CELL_MULTIPLY_RIGHT',
-    'd' : 'CELL_DEVIDE_RIGHT',
+    'a': 'CELL_ADD_RIGHT',
+    's': 'CELL_SUBTRACT_RIGHT',
+    'm': 'CELL_MULTIPLY_RIGHT',
+    'd': 'CELL_DEVIDE_RIGHT',
 
     # Input/Output
-    '^' : 'SCAN_ASCII',
-    '/' : 'SCAN_DECIMAL',
-    'v' : 'PRINT_CELL_ASCII',
-    '\\' : 'PRINT_CELL_DECIMAL',
+    '^': 'SCAN_ASCII',
+    '/': 'SCAN_DECIMAL',
+    'v': 'PRINT_CELL_ASCII',
+    '\\': 'PRINT_CELL_DECIMAL',
 
     # Debug
-    'w' : "PRINT_PROGRAM_STATE"}
+    'w': "PRINT_PROGRAM_STATE"}
 
 TOKENS_COMMAND_VALUE = {
     # Control
-    ':' : 'LABEL_GOTO',
-    ';' : 'LABEL_DECLARE',
-    '?' : 'LABEL_GOTO_NONZERO',
-    '!' : 'LABEL_GOTO_ZERO',
+    ':': 'LABEL_GOTO',
+    ';': 'LABEL_DECLARE',
+    '?': 'LABEL_GOTO_NONZERO',
+    '!': 'LABEL_GOTO_ZERO',
 
     # Cell/Pointer Manipulation
-    '=' : 'CELL_SET',
-    '~' : 'CELL_INCREASE_WITH',
+    '=': 'CELL_SET',
+    '~': 'CELL_INCREASE_WITH',
 
-    '%' : 'COPY_VALUE_TO',
+    '%': 'COPY_VALUE_TO',
 
-    '_' : 'POINTER_MOVE_TO',
-    '*' : 'POINTER_MOVE_RELATIVE',
+    '_': 'POINTER_MOVE_TO',
+    '*': 'POINTER_MOVE_RELATIVE',
 
-    '@' : 'CELL_SUBTRACT_ASCII',
+    '@': 'CELL_SUBTRACT_ASCII',
 
     # Input/Output
-    '.' : 'PRINT_CHARACTER',
+    '.': 'PRINT_CHARACTER',
 
-    '\'' : 'PRINT_UNTIL',
-    '\"' : 'PRINT_STOP',
+    '\'': 'PRINT_UNTIL',
+    '\"': 'PRINT_STOP',
 
     # Commenting
-    '#' : 'COMMENT',
-    '[' : 'COMMENT_START',
-    ']' : 'COMMENT_END'}
+    '#': 'COMMENT',
+    '[': 'COMMENT_START',
+    ']': 'COMMENT_END'}
 
 LEXER_COMMANDS = [
     'ADD_TO_PREVIOUS']
+
 
 def switch_lexer_state(lexer_state: LexerStates, command: str) -> LexerStates:
     """
@@ -81,6 +82,7 @@ def switch_lexer_state(lexer_state: LexerStates, command: str) -> LexerStates:
     elif command == 'COMMENT_START':
         state = LexerStates.GO_UNTIL_END_COMMENT
     return state
+
 
 def find_token(lexer_vars: LexerVars, word: str) -> Tuple[LexerVars, Token]:
     """
@@ -135,6 +137,7 @@ def find_token(lexer_vars: LexerVars, word: str) -> Tuple[LexerVars, Token]:
     # print(token)
     return lxr_vrs, token
 
+
 def combine_tokens(token_list: List[Token], i: int) -> List[Token]:
     """
     Combines tokens with the next token in the sequence if needed
@@ -154,6 +157,7 @@ def combine_tokens(token_list: List[Token], i: int) -> List[Token]:
 
     return combine_tokens(tokens, i)
 
+
 def remove_comments(token_list: List[Token], i: int) -> List[Token]:
     """
     Removes comment tokens
@@ -168,6 +172,7 @@ def remove_comments(token_list: List[Token], i: int) -> List[Token]:
     i += 1
 
     return remove_comments(tokens, i)
+
 
 def cleanup_tokens(token_list: List[Token]) -> List[Token]:
     """
@@ -189,6 +194,7 @@ def cleanup_tokens(token_list: List[Token]) -> List[Token]:
 
     return tokens
 
+
 def process_line(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
     """
     Returns a list of tokens which depend on the previously generated tokens
@@ -206,6 +212,7 @@ def process_line(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
 
     return process_line(lxr_vrs)
 
+
 def process_lines(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
     """
     A function that recursively goes through every list in the source_list of a LexerVars
@@ -216,18 +223,23 @@ def process_lines(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
     while lexer_variables.line_nr < len(lexer_variables.source):
         line_tokens = []
         lexer_variables, line_tokens = process_line(lexer_variables)
+
         tokens.extend(line_tokens)
+
         lexer_variables.word_nr = 0
         lexer_variables.line_nr += 1
-        lexer_variables.token_list = []
+        lexer_variables.tokens = []
     return lexer_variables, tokens
 
-def lexer(source: str) -> List[Token]:
+
+def lexer(source: str) -> Union[List[Token], List[WtfError]]:
     """
     A function that converts a string of characters into tokens
     Returns a list of tokens
     """
     source_list = [(line.strip("\n")).split() + ['\n'] for line in source]
+
     lexer_vars = LexerVars([], LexerStates.DEFAULT, source_list, 0, 0, [])
     lexer_vars, tokens = process_lines(lexer_vars)
-    return cleanup_tokens(tokens)
+    # for fnc in tokens: print(fnc)
+    return cleanup_tokens(tokens), lexer_vars.errors
