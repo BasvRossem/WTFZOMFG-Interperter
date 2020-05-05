@@ -7,37 +7,37 @@ from copy import copy
 #     return p_s
 
 # Control
-def label_goto(program_state, args):
+def label_goto(args):
     return args
 
-def label_declare(program_state, args):
+def label_declare(program_state):
     return program_state
 
-def label_goto_nonzero(program_state, args):
+def label_goto_nonzero(program_state):
     if int(program_state.memory[program_state.pointer]):
         return True
     return False
 
-def label_goto_zero(program_state, args):
+def label_goto_zero(program_state):
     if int(program_state.memory[program_state.pointer]):
         return False
     return True
 
-def loop_start(program_state, args):
+def loop_start(program_state):
     if program_state.memory[program_state.pointer]:
         return True
     return False
 
-def loop_end(program_state, args):
+def loop_end(program_state):
     return program_state
 
-def if_start(program_state, args):
+def if_start(program_state):
     p_s = copy(program_state)
     if p_s.memory[p_s.pointer]:
         return True
     return False
 
-def if_end(program_state, args):
+def if_end(program_state):
     p_s = copy(program_state)
     return p_s
 
@@ -167,7 +167,7 @@ def print_until(program_state, args):
 # Debug
 def print_program_state(program_state, args):
     p_s = copy(program_state)
-    print(p_s)
+    print(p_s.pointer, p_s.memory)
     return p_s
 
 TOKEN_FUNCTIONS = {
@@ -201,5 +201,14 @@ TOKEN_FUNCTIONS = {
     'PRINT_CELL_DECIMAL': print_cell_decimal,
     'PRINT_CHARACTER': print_character,
     'PRINT_UNTIL': print_until,
-    'PRINT_PROGRAM_STATE': print_program_state
-}
+    'PRINT_PROGRAM_STATE': print_program_state}
+
+CONTROL_FUNCTIONS = [
+    label_goto,
+    label_declare,
+    label_goto_nonzero,
+    label_goto_zero,
+    loop_start,
+    loop_end,
+    if_start,
+    if_end]

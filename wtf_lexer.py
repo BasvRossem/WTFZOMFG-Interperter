@@ -1,5 +1,5 @@
 """A WTFZOMFG Lexer"""
-from copy import copy, deepcopy
+from copy import copy
 from typing import List, Tuple, Union
 
 from wtf_errors import UnknownCharacterError, WtfError
@@ -88,7 +88,7 @@ def find_token(lexer_vars: LexerVars, word: str) -> Tuple[LexerVars, Token]:
     """
     A function that creates a token using an word
     """
-    lxr_vrs = deepcopy(lexer_vars)
+    lxr_vrs = copy(lexer_vars)
     token = Token(None, None)
 
     # The lexer will try to make a new token
@@ -199,7 +199,7 @@ def process_line(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
     """
     Returns a list of tokens which depend on the previously generated tokens
     """
-    lxr_vrs = deepcopy(lexer_vars)
+    lxr_vrs = copy(lexer_vars)
 
     if not lxr_vrs.word_nr < len(lxr_vrs.source[lxr_vrs.line_nr]):
         return lxr_vrs, lxr_vrs.tokens
@@ -218,7 +218,7 @@ def process_lines(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
     A function that recursively goes through every list in the source_list of a LexerVars
     object and generates tokens for that list using the process_line function
     """
-    lexer_variables = deepcopy(lexer_vars)
+    lexer_variables = copy(lexer_vars)
     tokens = []
     while lexer_variables.line_nr < len(lexer_variables.source):
         line_tokens = []

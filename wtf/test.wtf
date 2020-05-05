@@ -1,3 +1,5 @@
+;START
+
 '================================\n"
 'TEST: PRINT_UNTIL\n"
 'Hello\nHello\n"
@@ -19,28 +21,29 @@ m w                  # 9 * 4 = 36
 '================================\n"
 & w                  # Copy 18 from cell 0 to cell 1
 %5 w                 # Copy 18 from cell 0 to cell 5
-_0 |                # Flip cell 0 from 18 to 0
+_0 |                 # Flip cell 0 from 18 to 0
 _5 =46 @- w          # Go to cell 5, set the value to 46 and subtract the ASCII value of '-' (45)
 *-4 w                # Move pointer 4 to the left
 *6 | w               # Move pointer 6 to the right and flip cell
 '================================\n"
-^ v .\n w
-.H .e .l .l .o . 
+'Please, enter a character " ^ .\n w
+.H .e .l .l .o
+' "
 .w .o .r .l .d .\n
 _8
-'input:" / \ \ .\n
+'Please, enter a decimal: " / \ .\n
 w
 '================================\n"
 'TEST: IF\n"
-=1 {
-    'This should be printed\n" w
+=1 w {
+    'This should be printed\n"
 }
-=0w{
+=0 w {
     'This should never be printed\n"
 }
+.b
 '================================\n"
 =5
-w
 'Loop starts"
 (
     '\nLoops Left: "
@@ -49,14 +52,13 @@ w
     + + +
     ' Small countdown "
     (
-        v -
+        - v ' "
     )
     <
-)
+) .\n
 '===============================\n"
 
-'For an infinite loop input anything but a 0: "/
-w
+'For an infinite loop input anything but a 0: " / 
 !SORRY
 ?END
 
@@ -65,4 +67,4 @@ w
 :SORRY
 
 ;END
-'You are done"
+'You are done\n"

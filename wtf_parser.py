@@ -12,7 +12,7 @@ def find_function(token: Token) -> Union[Function, WtfError]:
     or an error if no corresponding function can be found.
     """
     if type(token) is not type(Token()):
-        return UnknownTypeError(type(Token()), type(token))
+        return UnknownTypeError(Token(), token)
     if token.command not in TOKEN_FUNCTIONS:
         return UnknownTokenError(token)
     return Function(TOKEN_FUNCTIONS[token.command], token.value)
