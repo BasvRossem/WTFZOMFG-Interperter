@@ -75,7 +75,7 @@ class NotNumericError(WtfError):
 
 
 class OutOfBoundsError(WtfError):
-    """An error which declares that a number was expacted"""
+    """An error which declares that a number was expected"""
 
     def __init__(self, memory_size, position):
         self.memory_size = memory_size

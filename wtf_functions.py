@@ -369,7 +369,7 @@ def print_character(program_state: ProgramState, args: str) -> ProgramState:
 
 
 def print_until(program_state: ProgramState, args: str) -> ProgramState:
-        """
+    """
     This prints the cell at the pointer as an ASCII character
     """
     p_s = copy(program_state)

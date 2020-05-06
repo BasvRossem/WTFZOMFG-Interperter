@@ -11,6 +11,17 @@ from wtf_objects import Function, Interpreter, ProgramState
 from wtf_parser import parse
 
 
+def execute_counter(function):
+    """
+    A decorator to count how many times a function is executed
+    """
+    def inner(program_state: ProgramState, functions: List[Function], index: int = 0) -> ProgramState:
+        inner.counter += 1
+        return function(program_state, functions, index)
+    inner.counter = 0
+    return inner
+
+
 def pre_run(program_state: ProgramState,
             functions: List[Function],
             index: int) -> Tuple[ProgramState, List[Function]]:
@@ -58,6 +69,7 @@ def skip_to_end(functions: List[Function], index: int, start: str, end: str, cou
     return skip_to_end(functions, i, start, end, cntr)
 
 
+@execute_counter
 def execute(program_state: ProgramState, functions: List[Function], index: int = 0) -> ProgramState:
     """
     Executes the list of functions recursively for every function.
@@ -121,7 +133,7 @@ def execute(program_state: ProgramState, functions: List[Function], index: int =
     return execute(p_s, functions, p_s.next_index)
 
 
-def run(program_state: ProgramState, functions: List[Function]) -> ProgramState:
+def run(program_state: ProgramState, functions: List[Function]) -> Tuple[ProgramState, int]:
     """
     A function that executes the program
     """
@@ -130,7 +142,7 @@ def run(program_state: ProgramState, functions: List[Function]) -> ProgramState:
 
     p_s, fncs = pre_run(p_s, fncs, 0)
     p_s = execute(p_s, fncs)
-    return p_s
+    return p_s, execute.counter
 
 
 def interpret(file: str, memory_length: int, ignore_errors: bool) -> Interpreter:
@@ -161,11 +173,11 @@ def interpret(file: str, memory_length: int, ignore_errors: bool) -> Interpreter
     memory = [0 for i in range(memory_length)]
     pointer = 0
     program = ProgramState(memory, pointer, [], 0)
-    program_state = run(program, parsed)
+    program_state, count = run(program, parsed)
 
     if program_state.errors and not ignore_errors:
         print("There were runtime errors:")
         for err in program_state.errors:
             print(err)
-
+    print("Execute was called", count, "times")
     return Interpreter(tokens, lexer_errors, parsed, parser_errors, program_state)
