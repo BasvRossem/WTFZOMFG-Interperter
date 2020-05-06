@@ -1,6 +1,7 @@
 """Example main"""
 import argparse
-from wtf_interperter import interpret
+
+from wtf_interpreter import interpret
 
 if __name__ == "__main__":
     # Parsing command line arguments

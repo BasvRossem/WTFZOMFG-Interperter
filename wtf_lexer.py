@@ -111,7 +111,7 @@ def find_token(lexer_vars: LexerVars, word: str) -> Tuple[LexerVars, Token]:
                 token.value = word[1:-1]
                 lxr_vrs.state = LexerStates.DEFAULT
         # The Token is unknown in the list
-        elif word is not "\n":
+        elif word != "\n":
             line_nr = lxr_vrs.line_nr + 1
             word_nr = lxr_vrs.word_nr + 1
             error = UnknownCharacterError(word[0], word, line_nr, word_nr)
@@ -241,5 +241,5 @@ def lexer(source: str) -> Union[List[Token], List[WtfError]]:
 
     lexer_vars = LexerVars([], LexerStates.DEFAULT, source_list, 0, 0, [])
     lexer_vars, tokens = process_lines(lexer_vars)
-    # for fnc in tokens: print(fnc)
+
     return cleanup_tokens(tokens), lexer_vars.errors

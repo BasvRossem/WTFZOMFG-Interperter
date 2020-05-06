@@ -1,171 +1,271 @@
 """Module that holds all functionalities that WTFZOMFG can do"""
 from copy import copy
 
-# def function_template(program_state, args):
-#     p_s = copy(program_state)
-
-#     return p_s
-
+from wtf_objects import ProgramState
+from wtf_errors import UnknownTypeError, NotNumericError, OutOfBoundsError
 # Control
-def label_goto(args):
+def label_goto(args: str) -> str:
+    """
+    Returns the label which is associated to the function.
+    """
     return args
 
-def label_declare(program_state):
+def label_declare(program_state: ProgramState) -> ProgramState:
+    """
+    A function used to declare a goto label.
+    This function is mainly to help the interpreter
+    and to keep consistency thoughout the program.
+    """
     return program_state
 
-def label_goto_nonzero(program_state):
+def label_goto_nonzero(program_state: ProgramState) -> bool:
+    """
+    Checks if the cell at the current pointer does not equal 0.
+    """
     if int(program_state.memory[program_state.pointer]):
         return True
     return False
 
-def label_goto_zero(program_state):
+def label_goto_zero(program_state: ProgramState) -> bool:
+    """
+    Checks if the cell at the current pointer does equal 0.
+    """
     if int(program_state.memory[program_state.pointer]):
         return False
     return True
 
-def loop_start(program_state):
+def loop_start(program_state: ProgramState) -> bool:
+    """
+    Checks if the cell at the current pointer does not equal 0.
+    """
     if program_state.memory[program_state.pointer]:
         return True
     return False
 
-def loop_end(program_state):
+def loop_end(program_state: ProgramState) -> bool:
+    """
+    A function used to declare the end of a loop.
+    This function is mainly to help the interpreter
+    and to keep consistency thoughout the program.
+    """
     return program_state
 
-def if_start(program_state):
-    p_s = copy(program_state)
-    if p_s.memory[p_s.pointer]:
+def if_start(program_state: ProgramState) -> bool:
+    """
+    Checks if the cell at the current pointer does not equal 0.
+    """
+    if int(program_state.memory[program_state.pointer]):
         return True
     return False
 
-def if_end(program_state):
-    p_s = copy(program_state)
-    return p_s
+def if_end(program_state: ProgramState) -> bool:
+    """
+    A function used to declare the end of an if statement.
+    This function is mainly to help the interpreter
+    and to keep consistency thoughout the program.
+    """
+    return program_state
 
 # Cell/Pointer Manipulation
-def cell_increase(program_state, args):
+def cell_increase(program_state: ProgramState) -> ProgramState:
+    """
+    Increases the cell at the pointer
+    """
     p_s = copy(program_state)
-    p_s.memory[p_s.pointer] += 1
+    value = p_s.memory[p_s.pointer]
+    if not isinstance(value, type(int())): # Check if current cell is an integer
+        p_s.errors.append(UnknownTypeError(int(), value))
+    else:
+        p_s.memory[p_s.pointer] += 1
     return p_s
 
-def cell_decrease(program_state, args):
+def cell_decrease(program_state: ProgramState) -> ProgramState:
+    """
+    Decreases the cell at the pointer
+    """
     p_s = copy(program_state)
-    p_s.memory[p_s.pointer] -= 1
+    value = p_s.memory[p_s.pointer]
+    if not isinstance(value, type(int())): # Check if current cell is an integer
+        p_s.errors.append(UnknownTypeError(int(), value))
+    else:
+        p_s.memory[p_s.pointer] -= 1
     return p_s
 
-def cell_flip(program_state, args):
+def cell_flip(program_state: ProgramState) -> ProgramState:
+    """
+    If the cell at the pointer is 0, set it to 1, otherwise set it to 0
+    """
     p_s = copy(program_state)
-    if p_s.memory[p_s.pointer]:
+    value = p_s.memory[p_s.pointer]
+    if not isinstance(value, type(int())): # Check if current cell is an integer
+        p_s.errors.append(UnknownTypeError(int(), value))
+    elif p_s.memory[p_s.pointer]:
         p_s.memory[p_s.pointer] = 0
     else:
         p_s.memory[p_s.pointer] = 1
     return p_s
 
-def cell_set(program_state, args):
+def cell_set(program_state: ProgramState, args: str) -> ProgramState:
+    """
+    This sets the cell at the pointer to a number
+    """
     p_s = copy(program_state)
-    p_s.memory[p_s.pointer] = int(args)
+    if not args.isnumeric(): # Check if input is a number
+        p_s.errors.append(NotNumericError(args))
+    else:
+        p_s.memory[p_s.pointer] = int(args)
     return p_s
 
-def cell_increase_with(program_state, args):
+def cell_increase_with(program_state: ProgramState, args: str) -> ProgramState:
+    """
+    Increases the cell at the pointer by n (use negative to decrease)
+    """
     p_s = copy(program_state)
-    p_s.memory[p_s.pointer] += int(args)
+    value = p_s.memory[p_s.pointer]
+
+    if not isinstance(value, type(int())): # Check if current cell is an integer
+        p_s.errors.append(UnknownTypeError(int(), value))
+    else:
+        p_s.memory[p_s.pointer] += int(args)
     return p_s
 
-def copy_value_right(program_state, args):
+def copy_value_right(program_state: ProgramState) -> ProgramState:
+    """
+    Copies the cell at the pointer to the next cell to the right
+    """
     p_s = copy(program_state)
-    p_s.memory[p_s.pointer + 1] = p_s.memory[p_s.pointer]
+    if not p_s.pointer + 1 < len(p_s.memory): # Check if within bounds
+        p_s.errors.append(OutOfBoundsError(len(p_s.memory), p_s.pointer + 1))
+    else:
+        p_s.memory[p_s.pointer + 1] = p_s.memory[p_s.pointer]
     return p_s
 
-def copy_value_to(program_state, args):
+def copy_value_to(program_state: ProgramState, args: str) -> ProgramState:
+    """
+    Copies the cell at the pointer to cell number n
+    """
     p_s = copy(program_state)
-    p_s.memory[int(args)] = p_s.memory[p_s.pointer]
+    if not (int(args) < len(p_s.memory) and int(args) >= 0): # Check if within bounds
+        p_s.errors.append(OutOfBoundsError(len(p_s.memory), args))
+    else:
+        p_s.memory[int(args)] = p_s.memory[p_s.pointer]
     return p_s
 
-def pointer_move_left(program_state, args):
+def pointer_move_left(program_state: ProgramState) -> ProgramState:
+    """
+    Moves the pointer once to the left
+    """
     p_s = copy(program_state)
-    p_s.pointer -= 1
+    if not (p_s.pointer - 1 < len(p_s.memory) and p_s.pointer - 1 >= 0): # Check if within bounds
+        p_s.errors.append(OutOfBoundsError(len(p_s.memory), p_s.pointer - 1))
+    else:
+        p_s.pointer -= 1
     return p_s
 
-def pointer_move_right(program_state, args):
+def pointer_move_right(program_state: ProgramState) -> ProgramState:
+    """
+    Moves the pointer once to the right
+    """
     p_s = copy(program_state)
-    p_s.pointer += 1
+    if not (p_s.pointer + 1 < len(p_s.memory) and p_s.pointer + 1 >= 0): # Check if within bounds
+        p_s.errors.append(OutOfBoundsError(len(p_s.memory), p_s.pointer + 1))
+    else:
+        p_s.pointer += 1
+
+    return p_s
+
+def pointer_move_to(program_state: ProgramState, args: str) -> ProgramState:
+    """
+    Sets the the pointer to cell number n
+    """
+    p_s = copy(program_state)
+    
+    if not (int(args) < len(p_s.memory) and int(args) >= 0): # Check if within bounds
+        p_s.errors.append(OutOfBoundsError(len(p_s.memory), int(args)))
+    else:
+        p_s.pointer = int(args)
+    return p_s
+
+def pointer_move_relative(program_state: ProgramState, args: str) -> ProgramState:
+    """
+    Moves the pointer n cells right (negative to go left)
+    """
+    p_s = copy(program_state)
+    if not (p_s.pointer + int(args) < len(p_s.memory) and p_s.pointer + int(args) >= 0): # Check if within bounds
+        p_s.errors.append(OutOfBoundsError(len(p_s.memory), p_s.pointer + int(args)))
+    else:
+        p_s.pointer += int(args)
     if p_s.pointer < 0:
         p_s.error = "Memory pointer cannot be a negative number"
     return p_s
 
-def pointer_move_to(program_state, args):
+def cell_subtract_ascii(program_state: ProgramState, args: str) -> ProgramState:
+    """
+    Subtract the ASCII value of c from the cell at the pointer.
+    """
     p_s = copy(program_state)
-    p_s.pointer = int(args)
-    if p_s.pointer < 0:
-        p_s.error = "Memory pointer cannot be a negative number"
-    return p_s
-
-def pointer_move_relative(program_state, args):
-    p_s = copy(program_state)
-    p_s.pointer += int(args)
-    if p_s.pointer < 0:
-        p_s.error = "Memory pointer cannot be a negative number"
-    return p_s
-
-def cell_subtract_ascii(program_state, args):
-    p_s = copy(program_state)
-    p_s.memory[p_s.pointer] -= ord(args[0])
+    value = p_s.memory[p_s.pointer]
+    if not isinstance(value, type(int())): # Check if current cell is an integer
+        p_s.errors.append(UnknownTypeError(int(), value))
+    else:
+        p_s.memory[p_s.pointer] -= ord(args[0])
     return p_s
 
 # Arithmetic
-def cell_add_right(program_state, args):
+def cell_add_right(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     p_s.memory[p_s.pointer] = int(p_s.memory[p_s.pointer] + p_s.memory[p_s.pointer + 1])
     return p_s
 
-def cell_subtract_right(program_state, args):
+def cell_subtract_right(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     p_s.memory[p_s.pointer] = int(p_s.memory[p_s.pointer] - p_s.memory[p_s.pointer + 1])
     return p_s
 
-def cell_multiply_right(program_state, args):
+def cell_multiply_right(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     p_s.memory[p_s.pointer] = int(p_s.memory[p_s.pointer] * p_s.memory[p_s.pointer + 1])
     return p_s
 
-def cell_devide_right(program_state, args):
+def cell_devide_right(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     p_s.memory[p_s.pointer] = int(p_s.memory[p_s.pointer] / p_s.memory[p_s.pointer + 1])
     return p_s
 
 # Input/Output
-def scan_ascii(program_state, args):
+def scan_ascii(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     p_s.memory[p_s.pointer] = str(input())[0]
     return p_s
 
-def scan_decimal(program_state, args):
+def scan_decimal(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     p_s.memory[p_s.pointer] = int(input())
     return p_s
 
-def print_cell_ascii(program_state, args):
+def print_cell_ascii(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     print(p_s.memory[p_s.pointer], end="")
     return p_s
 
-def print_cell_decimal(program_state, args):
+def print_cell_decimal(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     print(int(p_s.memory[p_s.pointer]), end="")
     return p_s
 
-def print_character(program_state, args):
+def print_character(program_state: ProgramState, args: str) -> ProgramState:
     p_s = copy(program_state)
     print(args.replace("\\n", "\n"), end="")
     return p_s
 
 
-def print_until(program_state, args):
+def print_until(program_state: ProgramState, args: str) -> ProgramState:
     p_s = copy(program_state)
     print(args.replace("\\n", "\n"), end="")
     return p_s
 
 # Debug
-def print_program_state(program_state, args):
+def print_program_state(program_state: ProgramState) -> ProgramState:
     p_s = copy(program_state)
     print(p_s.pointer, p_s.memory)
     return p_s
