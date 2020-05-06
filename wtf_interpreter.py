@@ -15,7 +15,9 @@ def execute_counter(function):
     """
     A decorator to count how many times a function is executed
     """
-    def inner(program_state: ProgramState, functions: List[Function], index: int = 0) -> ProgramState:
+    def inner(program_state: ProgramState,
+              functions: List[Function],
+              index: int = 0) -> ProgramState:
         inner.counter += 1
         return function(program_state, functions, index)
     inner.counter = 0

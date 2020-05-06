@@ -212,7 +212,8 @@ def pointer_move_relative(program_state: ProgramState, args: str) -> ProgramStat
     Moves the pointer n cells right (negative to go left)
     """
     p_s = copy(program_state)
-    if not (p_s.pointer + int(args) < len(p_s.memory) and p_s.pointer + int(args) >= 0):  # Check if within bounds
+    if not (p_s.pointer + int(args) < len(p_s.memory)
+            and p_s.pointer + int(args) >= 0):  # Check if within bounds
         p_s.errors.append(OutOfBoundsError(
             len(p_s.memory), p_s.pointer + int(args)))
     else:
