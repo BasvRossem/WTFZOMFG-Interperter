@@ -124,10 +124,7 @@ def cell_set(program_state: ProgramState, args: str) -> ProgramState:
     This sets the cell at the pointer to a number
     """
     p_s = copy(program_state)
-    if not args.isnumeric():  # Check if input is a number
-        p_s.errors.append(NotNumericError(args))
-    else:
-        p_s.memory[p_s.pointer] = int(args)
+    p_s.memory[p_s.pointer] = int(args)
     return p_s
 
 

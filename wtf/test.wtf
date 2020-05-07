@@ -58,7 +58,7 @@ w
 ) .\n
 '===============================\n"
 
-'For an infinite loop input anything but a 0: " / 
+'For an infinite loop input any number but a 0: " / 
 !SORRY
 ?END
 

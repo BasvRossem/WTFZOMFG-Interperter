@@ -2,7 +2,7 @@
 
 import sys
 from copy import copy
-from typing import List, Tuple
+from typing import List, Tuple, Callable
 
 from wtf_errors import UnknownTypeError
 from wtf_functions import CONTROL_FUNCTIONS
@@ -11,7 +11,7 @@ from wtf_objects import Function, Interpreter, ProgramState
 from wtf_parser import parse
 
 
-def execute_counter(function):
+def execute_counter(function: Callable[[ProgramState, List[Function], int], ProgramState]) -> Callable[[ProgramState, List[Function], int], ProgramState]:
     """
     A decorator to count how many times a function is executed
     """
@@ -149,7 +149,7 @@ def run(program_state: ProgramState, functions: List[Function]) -> Tuple[Program
 
 def interpret(file: str, memory_length: int, ignore_errors: bool) -> Interpreter:
     """
-    This frunction interprets a WTFZOMGF file,
+    This function interprets a WTFZOMGF file,
     runs the program and returns an object containing
     errors and the final state of the program.
     """

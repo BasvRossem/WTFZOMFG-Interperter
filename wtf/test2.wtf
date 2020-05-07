@@ -7,11 +7,11 @@
 ;START
 > + | { :END }
 'Hello\nHello\n"
-.v
+.v ' "
 # Comment1
 #Comment2
 [comment3] howdy - i
 [Comment
 number 4]
-_9 =-5 *-8 -
+_9 w =-5 w *-8 -
 b -5
