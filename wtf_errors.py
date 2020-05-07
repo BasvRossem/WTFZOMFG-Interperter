@@ -22,8 +22,8 @@ class UnknownCharacterError(WtfError):
 
     def __str__(self) -> str:
         return str(type(self).__name__) + ": Unknown character (combination) in line " + \
-            str(self.__line) + " at word number " + str(self.__character_nr) + ": '" + \
-            str(self.__character) + "' in word '" + str(self.__line_nr) + "'"
+            str(self.__line_nr) + " at word number " + str(self.__character_nr) + ": '" + \
+            str(self.__character) + "' in word '" + str(self.__line) + "'"
 
     def __repr__(self) -> str:
         return self.__str__()
