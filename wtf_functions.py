@@ -2,7 +2,7 @@
 from copy import copy
 
 from wtf_objects import ProgramState
-from wtf_errors import UnknownTypeError, NotNumericError, OutOfBoundsError
+from wtf_errors import UnknownTypeError, OutOfBoundsError, WrongDivisionError
 # Control
 
 
@@ -235,25 +235,52 @@ def cell_subtract_ascii(program_state: ProgramState, args: str) -> ProgramState:
 # Arithmetic
 
 
+def cell_operator_right(program_state: ProgramState, operator: str) -> ProgramState:
+    """
+    Applies an operator on the cell to the right and stores the value in the current cell.
+    """
+    p_s = copy(program_state)
+
+    # Check if curent pointer is within bounds
+    if not (p_s.pointer < len(p_s.memory) and p_s.pointer >= 0):
+        p_s.errors.append(OutOfBoundsError(len(p_s.memory), p_s.pointer))
+    # Check if cell to the right is within bounds
+    elif not (p_s.pointer + 1 < len(p_s.memory) and p_s.pointer + 1 >= 0):
+        p_s.errors.append(OutOfBoundsError(len(p_s.memory), p_s.pointer + 1))
+
+    # Check if current cell is an integer
+    elif not isinstance(p_s.memory[p_s.pointer], type(int())):
+        p_s.errors.append(UnknownTypeError(int(), p_s.memory[p_s.pointer]))
+    # Check if next cell is an integer
+    elif not isinstance(p_s.memory[p_s.pointer + 1], type(int())):
+        p_s.errors.append(UnknownTypeError(int(), p_s.memory[p_s.pointer + 1]))
+
+    if operator == "add":
+        p_s.memory[p_s.pointer] = int(
+            p_s.memory[p_s.pointer] + p_s.memory[p_s.pointer + 1])
+    elif operator == "sub":
+        p_s.memory[p_s.pointer] = int(
+            p_s.memory[p_s.pointer] - p_s.memory[p_s.pointer + 1])
+    elif operator == "mul":
+        p_s.memory[p_s.pointer] = int(
+            p_s.memory[p_s.pointer] * p_s.memory[p_s.pointer + 1])
+    elif operator == "div":
+        if p_s.memory[p_s.pointer + 1] == 0:
+            p_s.errors.append(WrongDivisionError(p_s.memory[p_s.pointer + 1]))
+        else:
+            p_s.memory[p_s.pointer] = int(
+                p_s.memory[p_s.pointer] / p_s.memory[p_s.pointer + 1])
+    return p_s
+
+
+
 def cell_add_right(program_state: ProgramState) -> ProgramState:
     """
     Add the cell at the pointer to the cell once to the
     right, storing the result to the first cell
     """
     p_s = copy(program_state)
-
-    value = p_s.memory[p_s.pointer]
-
-    if not isinstance(value, type(int())):  # Check if current cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-
-    value = p_s.memory[p_s.pointer + 1]
-    if not isinstance(value, type(int())):  # Check if next cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-    else:
-        p_s.memory[p_s.pointer] = int(
-            p_s.memory[p_s.pointer] + p_s.memory[p_s.pointer + 1])
-    return p_s
+    return cell_operator_right(p_s, "add")
 
 
 def cell_subtract_right(program_state: ProgramState) -> ProgramState:
@@ -262,19 +289,7 @@ def cell_subtract_right(program_state: ProgramState) -> ProgramState:
     right, storing the result to the first cell
     """
     p_s = copy(program_state)
-
-    value = p_s.memory[p_s.pointer]
-
-    if not isinstance(value, type(int())):  # Check if current cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-
-    value = p_s.memory[p_s.pointer + 1]
-    if not isinstance(value, type(int())):  # Check if next cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-    else:
-        p_s.memory[p_s.pointer] = int(
-            p_s.memory[p_s.pointer] - p_s.memory[p_s.pointer + 1])
-    return p_s
+    return cell_operator_right(p_s, "sub")
 
 
 def cell_multiply_right(program_state: ProgramState) -> ProgramState:
@@ -283,19 +298,7 @@ def cell_multiply_right(program_state: ProgramState) -> ProgramState:
     right, storing the result to the first cell
     """
     p_s = copy(program_state)
-
-    value = p_s.memory[p_s.pointer]
-
-    if not isinstance(value, type(int())):  # Check if current cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-
-    value = p_s.memory[p_s.pointer + 1]
-    if not isinstance(value, type(int())):  # Check if next cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-    else:
-        p_s.memory[p_s.pointer] = int(
-            p_s.memory[p_s.pointer] * p_s.memory[p_s.pointer + 1])
-    return p_s
+    return cell_operator_right(p_s, "mul")
 
 
 def cell_devide_right(program_state: ProgramState) -> ProgramState:
@@ -304,19 +307,7 @@ def cell_devide_right(program_state: ProgramState) -> ProgramState:
     right, storing the result to the first cell
     """
     p_s = copy(program_state)
-
-    value = p_s.memory[p_s.pointer]
-
-    if not isinstance(value, type(int())):  # Check if current cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-
-    value = p_s.memory[p_s.pointer + 1]
-    if not isinstance(value, type(int())):  # Check if next cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-    else:
-        p_s.memory[p_s.pointer] = int(
-            p_s.memory[p_s.pointer] / p_s.memory[p_s.pointer + 1])
-    return p_s
+    return cell_operator_right(p_s, "div")
 
 # Input/Output
 

@@ -88,3 +88,15 @@ class OutOfBoundsError(WtfError):
 
     def __repr__(self) -> str:
         return self.__str__()
+
+class WrongDivisionError(WtfError):
+    """An error which declares that a number was expected"""
+
+    def __init__(self, value):
+        self.__value = value
+
+    def __str__(self) -> str:
+        return str(type(self).__name__) + ": Cannot divide by '" + str(self.__value) + "'"
+
+    def __repr__(self) -> str:
+        return self.__str__()
