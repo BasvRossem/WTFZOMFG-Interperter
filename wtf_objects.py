@@ -4,7 +4,7 @@ from typing import List, TypeVar, Union
 
 from wtf_errors import WtfError
 
-
+# Makes use of default enum string eg list(LexerStates)
 class LexerStates(Enum):
     """A class which represents all the possible states the lexer can be in"""
     DEFAULT = 0
