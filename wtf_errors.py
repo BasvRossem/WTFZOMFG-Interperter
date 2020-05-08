@@ -79,7 +79,7 @@ class NotNumericError(WtfError):
 
 
 class OutOfBoundsError(WtfError):
-    """An error which declares that a number was expected"""
+    """An error which declares that the position asked for is out of bounds"""
 
     def __init__(self, memory_size: int, position: int) -> None:
         self.__memory_size = memory_size
