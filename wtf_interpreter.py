@@ -1,7 +1,7 @@
 """A python WTFZOMFG interpreter"""
 
 import sys
-from copy import copy
+from copy import deepcopy
 from typing import List, Tuple, Callable
 
 from wtf_errors import UnknownTypeError
@@ -13,7 +13,7 @@ from wtf_parser import parse
 
 def execute_counter(function: Callable[[ProgramState, List[Function], int], ProgramState]) -> Callable[[ProgramState, List[Function], int], ProgramState]:
     """
-    A decorator to count how many times a function is executed
+    A decorator to count how many times the execute function is executed
     """
     def inner(program_state: ProgramState,
               functions: List[Function],
@@ -30,8 +30,8 @@ def pre_run(program_state: ProgramState,
     """
     Does some function cleanup and finds all goto declarations
     """
-    p_s = copy(program_state)
-    fnc = copy(functions)
+    p_s = deepcopy(program_state)
+    fnc = deepcopy(functions)
 
     i = index
 
@@ -55,7 +55,7 @@ def skip_to_end(functions: List[Function], index: int, start: str, end: str, cou
     Recursivly searches for the end function of an if statement or
     while loop and returns the index of the function afther that
     """
-    i = copy(index)
+    i = deepcopy(index)
     cntr = counter
 
     if not cntr > 0 and i < len(functions):
@@ -77,7 +77,7 @@ def execute(program_state: ProgramState, functions: List[Function], index: int =
     Executes the list of functions recursively for every function.
     Maganes lops, if statements, while loops and goto statements.
     """
-    p_s = copy(program_state)
+    p_s = deepcopy(program_state)
 
     if not index < len(functions):
         return p_s
@@ -139,8 +139,8 @@ def run(program_state: ProgramState, functions: List[Function]) -> Tuple[Program
     """
     A function that executes the program
     """
-    p_s = copy(program_state)
-    fncs = copy(functions)
+    p_s = deepcopy(program_state)
+    fncs = deepcopy(functions)
 
     p_s, fncs = pre_run(p_s, fncs, 0)
     p_s = execute(p_s, fncs)

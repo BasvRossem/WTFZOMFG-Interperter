@@ -1,5 +1,5 @@
 """A WTFZOMFG Lexer"""
-from copy import copy
+from copy import deepcopy
 from typing import List, Tuple, Union
 
 from wtf_errors import UnknownCharacterError, WtfError
@@ -74,7 +74,7 @@ def switch_lexer_state(lexer_state: LexerStates, command: str) -> LexerStates:
     """
     This function returns a state depending on the command
     """
-    state = copy(lexer_state)
+    state = deepcopy(lexer_state)
     if command == 'COMMENT':
         state = LexerStates.GO_UNTIL_NEWLINE
     elif command == 'PRINT_UNTIL':
@@ -88,7 +88,7 @@ def find_token(lexer_vars: LexerVars, word: str) -> Tuple[LexerVars, Token]:
     """
     A function that creates a token using an word
     """
-    lxr_vrs = copy(lexer_vars)
+    lxr_vrs = deepcopy(lexer_vars)
     token = Token(None, None)
 
     # The lexer will try to make a new token
@@ -142,7 +142,7 @@ def combine_tokens(token_list: List[Token], i: int) -> List[Token]:
     """
     Combines tokens with the next token in the sequence if needed
     """
-    tokens = copy(token_list)
+    tokens = deepcopy(token_list)
     if i == 0:
         tokens.reverse()
 
@@ -162,7 +162,7 @@ def remove_comments(token_list: List[Token], i: int) -> List[Token]:
     """
     Removes comment tokens
     """
-    tokens = copy(token_list)
+    tokens = deepcopy(token_list)
     if not i < len(tokens):
         return tokens
 
@@ -185,7 +185,7 @@ def cleanup_tokens(token_list: List[Token]) -> List[Token]:
 
     Returns a list of tokens
     """
-    tokens = copy(token_list)
+    tokens = deepcopy(token_list)
 
     tokens = list(filter(lambda token: token.command, tokens))
     tokens = combine_tokens(tokens, 0)
@@ -199,7 +199,7 @@ def process_line(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
     """
     Returns a list of tokens which depend on the previously generated tokens
     """
-    lxr_vrs = copy(lexer_vars)
+    lxr_vrs = deepcopy(lexer_vars)
 
     if not lxr_vrs.word_nr < len(lxr_vrs.source[lxr_vrs.line_nr]):
         return lxr_vrs, lxr_vrs.tokens
@@ -213,23 +213,27 @@ def process_line(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
     return process_line(lxr_vrs)
 
 
-def process_lines(lexer_vars: LexerVars) -> Tuple[LexerVars, List[Token]]:
+def process_lines(lexer_vars: LexerVars, tokens: List[Token]) -> Tuple[LexerVars, List[Token]]:
     """
     A function that recursively goes through every list in the source_list of a LexerVars
     object and generates tokens for that list using the process_line function
     """
-    lexer_variables = copy(lexer_vars)
-    tokens = []
-    while lexer_variables.line_nr < len(lexer_variables.source):
-        line_tokens = []
-        lexer_variables, line_tokens = process_line(lexer_variables)
+    lexer_variables = deepcopy(lexer_vars)
+    token_list = deepcopy(tokens)
 
-        tokens.extend(line_tokens)
+    if not lexer_variables.line_nr < len(lexer_variables.source):
+        return lexer_variables, token_list
 
-        lexer_variables.word_nr = 0
-        lexer_variables.line_nr += 1
-        lexer_variables.tokens = []
-    return lexer_variables, tokens
+    line_tokens = []
+    lexer_variables, line_tokens = process_line(lexer_variables)
+
+    token_list.extend(line_tokens)
+
+    lexer_variables.word_nr = 0
+    lexer_variables.line_nr += 1
+    lexer_variables.tokens = []
+
+    return process_lines(lexer_variables, token_list)
 
 
 def lexer(source: str) -> Union[List[Token], List[WtfError]]:
@@ -240,6 +244,6 @@ def lexer(source: str) -> Union[List[Token], List[WtfError]]:
     source_list = [(line.strip("\n")).split() + ['\n'] for line in source]
 
     lexer_vars = LexerVars([], LexerStates.DEFAULT, source_list, 0, 0, [])
-    lexer_vars, tokens = process_lines(lexer_vars)
+    lexer_vars, tokens = process_lines(lexer_vars, [])
 
     return cleanup_tokens(tokens), lexer_vars.errors

@@ -16,7 +16,7 @@ class LexerStates(Enum):
 class Token:
     """A token class which consists of a command and a value if needed"""
 
-    def __init__(self, command: str = None, value: str = None):
+    def __init__(self, command: str = None, value: str = None) -> None:
         self.command = command
         self.value = value
 
@@ -36,7 +36,7 @@ class LexerVars:
                  source_list: List[str],
                  line_nr: int,
                  word_nr: int,
-                 errors: List[WtfError]):
+                 errors: List[WtfError]) -> None:
         self.tokens = token_list
         self.state = lexer_state
         self.source = source_list
@@ -62,7 +62,7 @@ class ProgramState:
                  memory: List[Union[str, int]],
                  pointer: int,
                  errors: List[WtfError],
-                 next_index: int):
+                 next_index: int) -> None:
         self.memory = memory
         self.pointer = pointer
         self.errors = errors
@@ -91,7 +91,7 @@ class Function:
     """A data object that holds a function and its arguments"""
     T = TypeVar('T')
 
-    def __init__(self, function: T = None, args: str = None):
+    def __init__(self, function: T = None, args: str = None) -> None:
         self.func = function
         self.args = args
 
@@ -112,7 +112,7 @@ class Interpreter:
                  lexer_errors: List[WtfError],
                  parsed: List[Function],
                  parser_errors: List[WtfError],
-                 program_state: ProgramState):
+                 program_state: ProgramState) -> None:
         self.tokens = tokens
         self.lexer_errors = lexer_errors
         self.parsed = parsed
