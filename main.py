@@ -6,7 +6,7 @@ from wtf_interpreter import interpret
 if __name__ == "__main__":
     # Parsing command line arguments
     ARG_PARSER = argparse.ArgumentParser(
-        description='Interprets wtfzomfg code froma file')
+        description='Interprets wtfzomfg code from a file')
 
     ARG_PARSER.add_argument("-f", "--file", required=True,
                             type=str, help="filepath to a .wtf file")
