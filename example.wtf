@@ -1,0 +1,89 @@
+;Start    # Declare a label called Start
+
+# Commenting
+#========================
+# This is a single line comment
+[ This is a 
+multi line comment]
+
+'Printing: \n"
+#========================
+.H .i .\n    # Printing the characters h, i and a newline
+'Hi\n"       # Printing the line Hi and the newline
+
+'Input ouput: \n"
+#========================
+'Input a character: " ^ v .\n    # Input a character and print input
+'Input a number: " / \ .\n       # Input a number and print input
+
+'Debug: \n"
+#========================
+w    # Print the current pointer position and the memory
+
+'Cell manipulation: \n"
+#========================
+=0 w        # Set the cell value to 0
++ + + w     # Increase cell value by 3
+- - - w     # Increase cell value by 3 
+=5 ~-2 w    # Set the cell to 5 and increase the cell value by -2
+| w | w     # Set cell from 3 to 0 and set it to 1
+& %4 w      # Copy the cell value of 1 to the second cell and copy it to the cell at the 4th position, cell 5 
+=87 @- w    # Set the value to 87 and subtract the ASCII value of '-' (45)
+
+'Pointer manipulation: \n"
+#========================
+> > w      # Move the pointer 2 to the right
+< =17 w    # Move the pointer one to the left and set the cell value to 17
+_7 *2 w    # Move pointer to cell number 7 and move it 2 to the right
+
+# Clear memory
+#========================
+_0 =0 & > & >  & >  & >  & >  & >  & >  & >  & > _0 w
+
+'Artihmetic: \n"
+#========================
+=6 & a w      # Set cell to 6, copy to the right and add them together
+> =2 < s w    # Move pointer to the right, set cell to 2, move pointer back and subtract the second cell from the first 
+> =3 < m w    # Set second pointer to the value of 3 and multiply the first cell with the second
+& d w         # Copy the first cell value to the right and divide the first cell value by the second
+
+# Clear memory
+#========================
+_0 =0 & > & >  & >  & >  & >  & >  & >  & >  & > _0 w
+
+'Looping: \n"
+#========================
+=5                         # Set value to 5
+(                          # Start outer while loop if the value at the current cell is not 0
+    'Loops Left: "         # Print 'Loops Left:'
+    v -                    # Print amount of loops left an decrease amount
+    >                      # Shift pointer one to the right
+    + + +                  # Increase pointer value by 3
+    ' Small countdown "    # Print 'Small countdown'
+    (                      # Start inner while loop if the value at the current cell is not 0
+        - v ' "            # Decrease valkue, print value, and print a space
+    )                      # End of the inner while loop
+    < .\n                  # Move pointer one to the left and print a newline
+)                          # End of the outer while loop
+
+'Goto: \n"
+#========================
+'Go to start? 0 for no, anything else for yes: " / .\n    # Ask for user input
+?Start                                                    # If the value at the cell is not a 0, go to Start label declared at the top
+!Skip                                                     # If the value at the cell is a 0, go to Skip label
+
+'This will be skipped"                                    # This line wil be skipped because of the label jump
+
+;Skip                                                     # Declare the skip label
+
+'If: \n"
+#========================
+'Go to start? 0 for no, anything else for yes: " / .\n    # Ask for user input
+{ :Start }                                                # If the value is not 0 go to start label
+|                                                         # Flip value from 1 to 0 or ther way around
+{ :End }                                                  # If value is not 0 Go to End label
+
+'This will also be skipped"                               # This line wil be skipped because of the label jump
+
+;End                                                      # Declare End label
+'WTFZOMFG! \n"                                            # Last print
