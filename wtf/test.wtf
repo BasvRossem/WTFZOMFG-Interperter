@@ -41,7 +41,6 @@ w
 =0 w {
     'This should never be printed\n"
 }
-.b
 '================================\n"
 =5
 'Loop starts"

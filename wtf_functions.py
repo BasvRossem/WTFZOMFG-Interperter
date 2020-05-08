@@ -62,7 +62,7 @@ def if_start(program_state: ProgramState) -> bool:
     """
     Checks if the cell at the current pointer does not equal 0.
     """
-    if int(program_state.memory[program_state.pointer]):
+    if program_state.memory[program_state.pointer]:
         return True
     return False
 
@@ -109,10 +109,8 @@ def cell_flip(program_state: ProgramState) -> ProgramState:
     If the cell at the pointer is 0, set it to 1, otherwise set it to 0
     """
     p_s = deepcopy(program_state)
-    value = p_s.memory[p_s.pointer]
-    if not isinstance(value, type(int())):  # Check if current cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-    elif p_s.memory[p_s.pointer]:
+    
+    if p_s.memory[p_s.pointer]:
         p_s.memory[p_s.pointer] = 0
     else:
         p_s.memory[p_s.pointer] = 1
@@ -226,10 +224,10 @@ def cell_subtract_ascii(program_state: ProgramState, args: str) -> ProgramState:
     """
     p_s = deepcopy(program_state)
     value = p_s.memory[p_s.pointer]
-    if not isinstance(value, type(int())):  # Check if current cell is an integer
-        p_s.errors.append(UnknownTypeError(int(), value))
-    else:
+    if isinstance(value, type(int())):  # Check if current cell is an integer
         p_s.memory[p_s.pointer] -= ord(args[0])
+    else: #
+        p_s.memory[p_s.pointer] = ord(p_s.memory[p_s.pointer]) - ord(args[0])
     return p_s
 
 # Arithmetic
@@ -272,7 +270,6 @@ def cell_operator_right(program_state: ProgramState, operator: str) -> ProgramSt
             p_s.memory[p_s.pointer] = int(
                 p_s.memory[p_s.pointer] / p_s.memory[p_s.pointer + 1])
     return p_s
-
 
 
 def cell_add_right(program_state: ProgramState) -> ProgramState:
@@ -318,7 +315,11 @@ def scan_ascii(program_state: ProgramState) -> ProgramState:
     This scans one ASCII character to the cell at the pointer
     """
     p_s = deepcopy(program_state)
-    p_s.memory[p_s.pointer] = str(input())[0]
+    inpt = input()
+    if inpt == '-1': # For EOF checking
+        p_s.memory[p_s.pointer] = -1
+    else:
+        p_s.memory[p_s.pointer] = inpt[0]
     return p_s
 
 

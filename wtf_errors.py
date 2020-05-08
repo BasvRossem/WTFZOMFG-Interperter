@@ -1,8 +1,6 @@
 """All errors used in the WTF interperter"""
 from typing import TypeVar
 
-from wtf_objects import Token
-
 
 class WtfError():
     """A base class for all Errors"""
@@ -34,7 +32,7 @@ class UnknownCharacterError(WtfError):
 
 class UnknownTokenError(WtfError):
     """An error which declares that a token does not have an associated function"""
-
+    from wtf_objects import Token
     def __init__(self, token: Token) -> None:
         self.__token = token
 
@@ -107,3 +105,4 @@ class WrongDivisionError(WtfError):
 
     def __repr__(self) -> str:
         return self.__str__()
+
