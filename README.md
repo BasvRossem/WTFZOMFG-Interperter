@@ -1,5 +1,5 @@
-# WTFZOMFG-Interperter
-In interperter made in python for the [WTFZOMFG esolang](https://esolangs.org/wiki/WTFZOMFG), with a focus on functional programming. It is written for the ATP course and has all of the must haves of the assignment and more.
+# WTFZOMFG-Interpreter
+In interpreter made in python for the [WTFZOMFG esolang](https://esolangs.org/wiki/WTFZOMFG), with a focus on functional programming. It is written for the ATP course and has all of the must-haves of the assignment and more.
 
 # WTFZOMFG explanation
 ## Brainfuck
@@ -11,9 +11,9 @@ The memory of WTFZOMFG is an infinite row of memory cells. These cells can hold 
 ## Pointer
 The pointer of the program points to a single cell in the memory. We can manipulate the pointer by moving it one to the right or left of the memory cells. In WTFZOMFG it is also possible to jump the pointer to a specific cell. 
 
-Note that when jumping to a cell, that the numbering of cells start at 0, so the first cell in memory is cell 0, the second cell in memory is cell 1, the third cell in memory is cell 2, and so on. 
+Note that when jumping to a cell, that the numbering of cells starts at 0, so the first cell in memory is cell 0, the second cell in memory is cell 1, the third cell in memory is cell 2, and so on. 
 # Video 
-For a quick overview of the code you are reffered to the video below, which can be found [here](https://www.youtube.com/watch?v=ItVkOeLZ-S0) or below. Not everything could be shown in the video, for example there was no more time to discuss writing WTFZOMFG code yourself, but the [example file](./example.wtf) is quite extensive in its comments.
+For a quick overview of the code you are referred to the video below, which can be found [here](https://www.youtube.com/watch?v=ItVkOeLZ-S0) or below. Not everything could be shown in the video, for example there was no more time to discuss writing WTFZOMFG code yourself, but the [example file](./example.wtf) is quite extensive in its comments.
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=ItVkOeLZ-S0
 " target="_blank"><img src="http://img.youtube.com/vi/ItVkOeLZ-S0/0.jpg" 
@@ -31,62 +31,62 @@ python ./main.py -f ./example.wtf -m 10 -e
 The -e flag is to ignore the errors that are generated when parsing or lexing the file. Errors generated while executing the code will be returned at the end of the execution phase.
 
 # Assignment requirements
-The assignment requirements have been split into two secons, the mush haves and the should haves.
+The assignment requirements have been split into two sections, the must-haves, and the should-haves.
 
-## Must haves
+## Must-haves
 - Classes in the form of data objects
 - Inheritance with the errors
 - Object printing by implementing `__repr__` and `__str__`
 - Private variables in the error objects
 - A decorator to see how many times execute was called (this can be used to determine the needed recursion depth)
 - Programmed in a functional programming style
-- Type annotation in the functions (later this was specified as not being nessecary in the comments)
-- At least 3 uses of higher order functions such as map and filter.
+- Type annotation in the functions (later this was specified as not being necessary for the comments)
+- At least 3 uses of higher-order functions such as map and filter.
 
 ## Should haves
-- Simple error messanging when appropriate (see [errors](#errors) for more info)
+- Simple error messaging when appropriate (see [errors](#errors) for more info)
 - A simple debug command `w` to use in your WTFZOMFG code to visualize the pointer location and the memory at that time
 - Advanced features like comments, I/O support, arithmetic, and program flow control
 - A video as discussed [here](#video)
 
 
 # Errors
-The pointer to the memory starts at 0. So if you have 5 memmory cells, they are numbered 0, 1, 2, 3, 4
+The pointer to the memory starts at 0. So if you have 5 memory cells, they are numbered 0, 1, 2, 3, 4
 
 # Writing WTFZOMFG code
 IF you are ever confused to what each command does, please also refer to the [esolang wiki page on WTFZOMFG](https://esolangs.org/wiki/WTFZOMFG)
 
 ## Commenting
-Commenting is fairly simple in WTFZOMFG. To do a sinly line comment use the `#` command. Everything following this until a new line is considered a comment.
+Commenting is fairly simple in WTFZOMFG. To do a single line comment use the `#` command. Everything following this until a new line is considered a comment.
 
-Multi line comments are also supported. Anything between `[` and `]` is considered a comment. Nesting multiline comments is not supported.
+Multi-line comments are also supported. Anything between `[` and `]` is considered a comment. The nesting of multi-line comments is not supported.
 
 ```
 # This is a single line comment
-[This is a multi line comment]
+[This is a multi-line comment]
 ```
 
 ## Printing
-WTFZOMFG supports two types of printing: printing a single character usering a `.` followed by a character, or by placing what you weant to print between a `'` and a `"`.
+WTFZOMFG supports two types of printing: printing a single character by using a `.` followed by a character, or by placing what you want to print between a `'` and a `"`.
 ```
 .H .i .\n    # Printing the characters h, i and a newline
 'Hi\n"       # Printing the line Hi and the newline
 ```
 
-Note that you cannot print a single space character using the print singel character command, use the following instead:
+Note that you cannot print a single space character using the print single character command, use the following instead:
 ```
 ' "
 ```
 
 ## Input Output
-To input a character into a cell, use a a '^', and to print the cell value as a character, use a `v`. To input a number into a cell use a `/`, and to print the cell value as a number, use a `\`.
+To input a character into a cell, use a '^', and to print the cell value as a character, use a `v`. To input a number into a cell use a `/`, and to print the cell value as a number, use a `\`.
 
 ```
 'Input a character: " ^ v .\n    # Input a character and print input
 'Input a number: " / \ .\n       # Input a number and print input
 ```
 ## Cell manipulation
-There are several ways to change the value of a cell. These are more easily described ini code:
+There are several ways to change the value of a cell. These are more easily described in code:
 ```
 =0        # Set the cell value to 0
 + + +     # Increase cell value by 3
@@ -104,20 +104,20 @@ Moving a pointer can be done in several ways. One to the left `<` or right `>`, 
 ```
 > >      # Move the pointer 2 to the right
 <        # Move the pointer one to the left
-_7 *2    # Move pointer to cell number 7 and move it 2 to the right
+_7 *2    # Move the pointer to cell number 7 and move it 2 to the right
 ```
 
 ## Arithmetic
-WTFZOMFG support four different types of arithmetic: addition `a`, subtractioni `s`, multiplication `m`, and division `d`. This is done by using the value at the current cell and the cell to the right and applying the operator. The result will be stored in the currently selected cell.
+WTFZOMFG supports four different types of arithmetic: addition `a`, subtraction `s`, multiplication `m`, and division `d`. This is done by using the value at the current cell and the cell to the right and applying the operator. The result will be stored in the currently selected cell.
 
 ```
 =6 & a      # Set cell to 6, copy to the right and add them together
 > =2 < s    # Move pointer to the right, set cell to 2, 
-            # move pointer back and subtract the second cell from the first 
-> =3 < m    # Set second pointer to the value of 3 and multiply the first cell with the second
+            # move the pointer back and subtract the second cell from the first 
+> =3 < m    # Set the cell at the pointer to the value of 3 and multiply the first cell with the second
 & d         # Copy the first cell value to the right and divide the first cell value by the second
 ```
-Note that divisionis by 0 will be handled as an error and thus ignored.
+Note that a division by 0 will be handled as an error and thus ignored.
 ## Looping
 Then the start loop character `(` is read, and the current cell value is not a 0, it will start a loop until the corresponding end loop character `)` is found, and the end of the loop, the program will check the value again and loop if it is not 0. WTFZOMFG supports nested while loops.
 
@@ -125,12 +125,12 @@ Then the start loop character `(` is read, and the current cell value is not a 0
 =5                         # Set value to 5
 (                          # Start outer while loop if the value at the current cell is not 0
     'Loops Left: "         # Print 'Loops Left:'
-    v -                    # Print amount of loops left an decrease amount
+    v -                    # Print amount of loops left and decrease amount
     >                      # Shift pointer one to the right
     + + +                  # Increase pointer value by 3
     ' Small countdown "    # Print 'Small countdown'
     (                      # Start inner while loop if the value at the current cell is not 0
-        - v ' "            # Decrease valkue, print value, and print a space
+        - v ' "            # Decrease value, print value, and print a space
     )                      # End of the inner while loop
     < .\n                  # Move pointer one to the left and print a newline
 )                          # End of the outer while loop
@@ -147,12 +147,12 @@ anything else for yes: " / .\n    # Ask for user input
                                   # label declared at the top
 !Skip                             # If the value at the cell is a 0, go to Skip label
 
-'This will be skipped"            # This line wil be skipped because of the label jump
+'This will be skipped"            # This line will be skipped because of the label jump
 
 ;Skip                             # Declare the Skip label
 ```
 ## If
-To declare the start of an if statement, use the `{` command. If the current cell value is not zero, the code until the `}` command will be executed. If the current value is a zero, the code will be skipped.
+To declare the start of an if statement, use the `{` command. If the current cell value is not zero, the code until the `}` command will be executed. If the current value is zero, the code will be skipped.
 
 An if else statement would look like this:
 ```
@@ -168,7 +168,7 @@ anything else for yes: " / .\n    # Ask for user input
 |                                 # Flip value from 1 to 0 or ther way around
 { :End }                          # If value is not 0 Go to End label
 
-'This will also be skipped"       # This line wil be skipped because of the label jump
+'This will also be skipped"       # This line will be skipped because of the label jump
 
 ;End                              # Declare End label
 ```
