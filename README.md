@@ -54,7 +54,7 @@ The assignment requirements have been split into two sections, the must-haves, a
 The pointer to the memory starts at 0. So if you have 5 memory cells, they are numbered 0, 1, 2, 3, 4
 
 # Writing WTFZOMFG code
-IF you are ever confused to what each command does, please also refer to the [esolang wiki page on WTFZOMFG](https://esolangs.org/wiki/WTFZOMFG)
+If you are ever confused to what each command does, please also refer to the [esolang wiki page on WTFZOMFG](https://esolangs.org/wiki/WTFZOMFG)
 
 ## Commenting
 Commenting is fairly simple in WTFZOMFG. To do a single line comment use the `#` command. Everything following this until a new line is considered a comment.
