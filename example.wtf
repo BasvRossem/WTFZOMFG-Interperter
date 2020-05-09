@@ -72,7 +72,7 @@ _0 =0 & > & >  & >  & >  & >  & >  & >  & >  & > _0 w
 ?Start                                                    # If the value at the cell is not a 0, go to Start label declared at the top
 !Skip                                                     # If the value at the cell is a 0, go to Skip label
 
-'This will be skipped"                                    # This line wil be skipped because of the label jump
+'This will be skipped"                                    # This line will be skipped because of the label jump
 
 ;Skip                                                     # Declare the skip label
 
@@ -83,7 +83,7 @@ _0 =0 & > & >  & >  & >  & >  & >  & >  & >  & > _0 w
 |                                                         # Flip value from 1 to 0 or ther way around
 { :End }                                                  # If value is not 0 Go to End label
 
-'This will also be skipped"                               # This line wil be skipped because of the label jump
+'This will also be skipped"                               # This line will be skipped because of the label jump
 
 ;End                                                      # Declare End label
 'WTFZOMFG! \n"                                            # Last print
