@@ -1,5 +1,5 @@
 # WTFZOMFG-Interpreter
-In interpreter made in python for the [WTFZOMFG esolang](https://esolangs.org/wiki/WTFZOMFG), with a focus on functional programming. It is written for the ATP course and has all of the must-haves of the assignment and more.
+An interpreter made in python for the [WTFZOMFG esolang](https://esolangs.org/wiki/WTFZOMFG), with a focus on functional programming. It is written for the ATP course and has all of the must-haves of the assignment and more.
 
 # WTFZOMFG explanation
 ## Brainfuck
