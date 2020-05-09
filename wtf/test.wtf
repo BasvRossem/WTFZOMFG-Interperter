@@ -14,17 +14,17 @@ w
 w
 '================================\n"
 'TEST: ARITHMETIC\n"
-=5 > =8 < a w   # 5 + 8 = 13
-> - - - - < s w            # 13 - 4 = 9
-m w                  # 9 * 4 = 36
-> - - < d w             # 36 / 2 = 18
+=5 > =8 < a w      # 5 + 8 = 13
+> - - - - < s w    # 13 - 4 = 9
+m w                # 9 * 4 = 36
+> - - < d w        # 36 / 2 = 18
 '================================\n"
-& w                  # Copy 18 from cell 0 to cell 1
-%5 w                 # Copy 18 from cell 0 to cell 5
-_0 |                 # Flip cell 0 from 18 to 0
-_5 =46 @- w          # Go to cell 5, set the value to 46 and subtract the ASCII value of '-' (45)
-*-4 w                # Move pointer 4 to the left
-*6 | w               # Move pointer 6 to the right and flip cell
+& w            # Copy 18 from cell 0 to cell 1
+%5 w           # Copy 18 from cell 0 to cell 5
+_0 |           # Flip cell 0 from 18 to 0
+_5 =46 @- w    # Go to cell 5, set the value to 46 and subtract the ASCII value of '-' (45)
+*-4 w          # Move pointer 4 to the left
+*6 | w         # Move pointer 6 to the right and flip cell
 '================================\n"
 'Please, enter a character " ^ .\n w
 .H .e .l .l .o
