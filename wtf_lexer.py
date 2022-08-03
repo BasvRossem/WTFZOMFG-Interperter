@@ -1,5 +1,7 @@
 """A WTFZOMFG Lexer"""
 from copy import deepcopy
+from itertools import accumulate
+import time
 from typing import List, Tuple, Union
 
 from wtf_errors import UnknownCharacterError, WtfError
@@ -137,41 +139,31 @@ def find_token(lexer_vars: LexerVars, word: str) -> Tuple[LexerVars, Token]:
     # print(token)
     return lxr_vrs, token
 
-
-def combine_tokens(token_list: List[Token], i: int) -> List[Token]:
+def combine_tokens_core(token, next_token) -> List[Token]:
     """
-    Combines tokens with the next token in the sequence if needed
+    Extends the next token value when needed.
+    """
+    deepcopy(next_token)
+    if token.command == 'ADD_TO_PREVIOUS':
+        next_token.value += ' ' + token.value
+
+    return next_token
+
+def combine_tokens(token_list: List[Token]) -> List[Token]:
+    """
+    Combines tokens with the next token in the sequence if needed.
     """
     tokens = deepcopy(token_list)
-    if i == 0:
-        tokens.reverse()
-
-    if not i < len(tokens):
-        tokens.reverse()
-        return tokens
-
-    if tokens[i].command == 'ADD_TO_PREVIOUS':
-        tokens[i + 1].value += " " + tokens[i].value
-        tokens[i].command = None
-    i += 1
-
-    return combine_tokens(tokens, i)
+    tokens = list(accumulate(tokens, combine_tokens_core))
+    tokens = list(filter(lambda token: token.command != 'ADD_TO_PREVIOUS', tokens))
+    return tokens
 
 
-def remove_comments(token_list: List[Token], i: int) -> List[Token]:
+def remove_comments(token_list: List[Token]) -> List[Token]:
     """
     Removes comment tokens
     """
-    tokens = deepcopy(token_list)
-    if not i < len(tokens):
-        return tokens
-
-    if tokens[i].command == 'COMMENT' or tokens[i].command == 'COMMENT_START':
-        tokens[i].command = None
-        tokens[i].value = None
-    i += 1
-
-    return remove_comments(tokens, i)
+    return list(filter(lambda t: not (t.command == 'COMMENT' or t.command == 'COMMENT_START'), token_list))
 
 
 def cleanup_tokens(token_list: List[Token]) -> List[Token]:
@@ -188,8 +180,10 @@ def cleanup_tokens(token_list: List[Token]) -> List[Token]:
     tokens = deepcopy(token_list)
 
     tokens = list(filter(lambda token: token.command, tokens))
-    tokens = combine_tokens(tokens, 0)
-    tokens = remove_comments(tokens, 0)
+    tokens.reverse()
+    tokens = combine_tokens(tokens)
+    tokens.reverse()
+    tokens = remove_comments(tokens)
     tokens = list(filter(lambda token: token.command, tokens))
 
     return tokens
